@@ -227,12 +227,31 @@
       <p class="result-amount" id="result-amount"></p>
       <p class="result-detail" id="result-detail"></p>
       <p class="result-tip hidden" id="result-tip"></p>
+      <p class="result-tip hidden" id="result-bons-plans" style="border-top:none; padding-top:0;"></p>
     </div>
   </div>
 
 </main>
 
-<footer>CarburantFrontalier — v1, prix mis à jour manuellement pour l'instant</footer>
+<style>
+  footer{text-align:center; padding:28px 20px; font-size:12px; color:var(--grey); border-top:1px solid var(--border); margin-top:12px;}
+  .footer-name{font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--black); font-size:14px; margin:0 0 4px;}
+  .footer-tagline{margin:0 0 12px;}
+  .footer-links{margin:0 0 12px;}
+  .footer-links a{color:var(--black); text-decoration:none; margin:0 6px;}
+  .footer-links a:hover{text-decoration:underline;}
+  .footer-copy{margin:0; color:var(--grey);}
+</style>
+<footer>
+  <p class="footer-name">CarburantFrontalier</p>
+  <p class="footer-tagline">Comparateur de rentabilité carburant pour frontaliers</p>
+  <p class="footer-links">
+    <a href="/">Mentions légales</a>·
+    <a href="/">Confidentialité</a>·
+    <a href="mailto:carburantfrontalier@gmail.com">Contact</a>
+  </p>
+  <p class="footer-copy">© 2026 CarburantFrontalier</p>
+</footer>
 
 <script>
   // --- Jauge à curseur (0 = vide, 8 = plein, chaque cran = 1/8) ---
@@ -252,6 +271,14 @@
   }
   gaugeInput.addEventListener('input', updateGauge);
   updateGauge();
+
+  // --- Messages "bons plans" par pays (affichés seulement si pas rentable sur le carburant) ---
+  const bonsPlans = {
+    'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.',
+    'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie.',
+    'Belgique': 'Bon à savoir : le tabac est environ -37% moins cher en Belgique.',
+    'Luxembourg': 'Bon à savoir : tabac -55%, carburant et alcools avantagés par des taxes plus basses au Luxembourg.'
+  };
 
   // --- Calcul de rentabilité ---
   function calculer(){
@@ -286,6 +313,7 @@
     const amount = document.getElementById('result-amount');
     const detail = document.getElementById('result-detail');
     const tip = document.getElementById('result-tip');
+    const bonsPlansEl = document.getElementById('result-bons-plans');
 
     resultCard.classList.remove('hidden');
 
@@ -294,6 +322,7 @@
       title.className = 'result-title ok';
       title.textContent = '✓ Rentable';
       tip.classList.add('hidden');
+      bonsPlansEl.classList.add('hidden');
     } else {
       box.className = 'result bad';
       title.className = 'result-title bad';
@@ -302,6 +331,14 @@
       const litresSupp = Math.max(0, litresPourRentable - litresManquants);
       tip.textContent = 'En achetant ' + litresSupp.toFixed(1) + ' L de plus sur place, le trajet devient rentable.';
       tip.classList.remove('hidden');
+
+      const pays = opt.dataset.pays;
+      if(bonsPlans[pays]){
+        bonsPlansEl.textContent = bonsPlans[pays];
+        bonsPlansEl.classList.remove('hidden');
+      } else {
+        bonsPlansEl.classList.add('hidden');
+      }
     }
 
     amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
