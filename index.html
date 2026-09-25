@@ -68,6 +68,44 @@
     font-family:inherit;
     background:var(--white);
   }
+  .input-group{display:flex; gap:8px; position:relative;}
+  .btn-geoloc{
+    background:var(--black);
+    color:var(--white);
+    border:none;
+    border-radius:var(--radius);
+    padding:0 14px;
+    cursor:pointer;
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* Autocomplétion adresse.data.gouv.fr */
+  .autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 50px;
+    z-index: 99;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-top: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .autocomplete-suggestion {
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--ecru);
+  }
+  .autocomplete-suggestion:last-child { border-bottom: none; }
+  .autocomplete-suggestion:hover { background: var(--ecru); }
+
   .row{display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:16px;}
   .field{margin-bottom:16px;}
 
@@ -185,7 +223,11 @@
 
     <div class="field">
       <label for="depart">Où êtes-vous ?</label>
-      <input type="text" id="depart" placeholder="Adresse ou ville de départ" value="Perpignan" />
+      <div class="input-group">
+        <input type="text" id="depart" placeholder="Commencez à taper une adresse..." autocomplete="off" value="" />
+        <button type="button" class="btn-geoloc" onclick="geolocaliser()" title="Utiliser ma position actuelle">📍</button>
+        <div id="suggestions" class="autocomplete-suggestions hidden"></div>
+      </div>
     </div>
 
     <div class="field">
@@ -239,8 +281,8 @@
     <div class="field">
       <label for="destination">Station de destination</label>
       <select id="destination">
-        <option value="jonquera" data-pays="Espagne" data-km="64" data-peage="7" data-prix-gazole="1.49" data-prix-sp95="1.56">La Jonquera, ES (Perpignan)</option>
-        <option value="perthus" data-pays="Espagne" data-km="56" data-peage="6" data-prix-gazole="1.51" data-prix-sp95="1.58">Le Perthus, ES (Perpignan)</option>
+        <option value="jonquera" data-pays="Espagne" data-km="64" data-peage="7" data-prix-gazole="1.49" data-prix-sp95="1.56">La Jonquera, ES</option>
+        <option value="perthus" data-pays="Espagne" data-km="56" data-peage="6" data-prix-gazole="1.51" data-prix-sp95="1.58">Le Perthus, ES</option>
       </select>
       <p style="font-size:11px; color:var(--grey); margin:6px 0 0;">Liste v1 limitée — on l'étendra avec plus de stations et de villes de départ</p>
     </div>
@@ -261,9 +303,7 @@
     <!-- Stations françaises les moins chères à proximité -->
     <div id="fr-stations-container" class="hidden">
       <p class="fr-stations-title">🇫🇷 Les moins chères près de chez vous :</p>
-      <div id="fr-stations-list">
-        <!-- Rempli dynamiquement via l'API OpenData -->
-      </div>
+      <div id="fr-stations-list"></div>
     </div>
   </div>
 
@@ -281,18 +321,92 @@
 </footer>
 
 <script>
-  // --- Fonction pour masquer le résultat dès qu'une saisie change ---
+  const inputDepart = document.getElementById('depart');
+  const suggestionsBox = document.getElementById('suggestions');
+  let timeoutSearch = null;
+
+  // Autocomplétion via l'API officielle adresse.data.gouv.fr
+  inputDepart.addEventListener('input', () => {
+    resetResultat();
+    const query = inputDepart.value.trim();
+
+    clearTimeout(timeoutSearch);
+    if (query.length < 3) {
+      suggestionsBox.classList.add('hidden');
+      return;
+    }
+
+    timeoutSearch = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
+        const data = await res.json();
+        
+        if (data.features && data.features.length > 0) {
+          suggestionsBox.innerHTML = '';
+          data.features.forEach(feature => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-suggestion';
+            div.textContent = feature.properties.label;
+            div.onclick = () => {
+              inputDepart.value = feature.properties.label;
+              suggestionsBox.classList.add('hidden');
+            };
+            suggestionsBox.appendChild(div);
+          });
+          suggestionsBox.classList.remove('hidden');
+        } else {
+          suggestionsBox.classList.add('hidden');
+        }
+      } catch (e) {
+        suggestionsBox.classList.add('hidden');
+      }
+    }, 300);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!inputDepart.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      suggestionsBox.classList.add('hidden');
+    }
+  });
+
+  // Géolocalisation sur le bouton 📍
+  function geolocaliser() {
+    if (navigator.geolocation) {
+      inputDepart.placeholder = "Recherche de la position...";
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${lon}&lat=${lat}`);
+          const data = await res.json();
+          if (data.features && data.features.length > 0) {
+            inputDepart.value = data.features[0].properties.label;
+          } else {
+            inputDepart.value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+          }
+          resetResultat();
+        } catch (e) {
+          inputDepart.value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        }
+      }, () => {
+        inputDepart.placeholder = "Commencez à taper une adresse...";
+        alert("Géolocalisation refusée ou indisponible.");
+      });
+    } else {
+      alert("Votre navigateur ne supporte pas la géolocalisation.");
+    }
+  }
+
   function resetResultat(){
     document.getElementById('result-card').classList.add('hidden');
   }
 
-  document.getElementById('depart').addEventListener('input', resetResultat);
   document.getElementById('reservoir-cap').addEventListener('change', resetResultat);
   document.getElementById('carburant').addEventListener('change', resetResultat);
   document.getElementById('gauge-input').addEventListener('input', resetResultat);
   document.getElementById('destination').addEventListener('change', resetResultat);
 
-  // --- Jauge à curseur (0 = vide, 8 = plein, chaque cran = 1/8) ---
+  // Jauge à curseur
   const gaugeInput = document.getElementById('gauge-input');
   const gaugeFill = document.getElementById('gauge-fill');
   const gaugeHandle = document.getElementById('gauge-handle');
@@ -310,7 +424,6 @@
   gaugeInput.addEventListener('input', updateGauge);
   updateGauge();
 
-  // --- Messages "bons plans" par pays ---
   const bonsPlans = {
     'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.',
     'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie.',
@@ -318,15 +431,14 @@
     'Luxembourg': 'Bon à savoir : tabac -55%, carburant et alcools avantagés par des taxes plus basses au Luxembourg.'
   };
 
-  // --- Charger les stations FR proches via API ---
+  // Charger les stations FR proches
   async function chargerStationsFR(ville, carburant) {
     const listEl = document.getElementById('fr-stations-list');
     const containerEl = document.getElementById('fr-stations-container');
     
-    // Exemple de données simulées ou récupérées depuis ton API OpenData
     const mockStations = [
-      { nom: 'E.Leclerc Perpignan', dist: '2.4 km', prix: '1.82 €' },
-      { nom: 'TotalEnergies Relais', dist: '3.1 km', prix: '1.85 €' },
+      { nom: 'E.Leclerc', dist: '2.4 km', prix: '1.82 €' },
+      { nom: 'TotalEnergies', dist: '3.1 km', prix: '1.85 €' },
       { nom: 'Carrefour Market', dist: '4.0 km', prix: '1.86 €' }
     ];
 
@@ -343,11 +455,11 @@
     containerEl.classList.remove('hidden');
   }
 
-  // --- Calcul de rentabilité ---
+  // Calcul de rentabilité
   function calculer(){
     const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value) || 0;
-    const conso = 5.0; // Valeur fixe par défaut (5 L / 100 km)
-    const niveauFraction = parseInt(gaugeInput.value, 10) / 8; // 0 à 1
+    const conso = 5.0;
+    const niveauFraction = parseInt(gaugeInput.value, 10) / 8;
     const litresManquants = reservoirCap * (1 - niveauFraction);
 
     const destSelect = document.getElementById('destination');
@@ -405,8 +517,7 @@
     amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
     detail.textContent = 'Sur ' + litresManquants.toFixed(1) + ' L, trajet (' + km + ' km A/R) et péage (' + peage.toFixed(2) + ' €) déduits';
 
-    // Appel des stations françaises proches
-    const villeDepart = document.getElementById('depart').value;
+    const villeDepart = inputDepart.value;
     chargerStationsFR(villeDepart, carburant);
 
     resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
