@@ -127,15 +127,22 @@
   }
   button.primary:active{opacity:0.85;}
 
+  /* Textes des résultats plus grands */
   .result{border-radius:var(--radius); padding:18px; margin-top:6px;}
   .result.ok{background:#EAF3EF;}
   .result.bad{background:#F6E9E7;}
-  .result-title{display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:6px; font-size:14px;}
+  .result-title{display:flex; align-items:center; gap:8px; font-weight:700; margin-bottom:6px; font-size:18px;}
   .result-title.ok{color:var(--green);}
   .result-title.bad{color:var(--red);}
-  .result-amount{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; margin:0 0 4px;}
-  .result-detail{font-size:12px; color:#555; margin:0;}
-  .result-tip{font-size:13px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);}
+  .result-amount{font-family:'Space Grotesk',sans-serif; font-size:32px; font-weight:700; margin:0 0 4px;}
+  .result-detail{font-size:14px; color:#444; margin:0; line-height:1.4;}
+  .result-tip{font-size:15px; font-weight:500; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08); line-height:1.4;}
+
+  /* Accentuation rouge pour les litres à racheter */
+  .highlight-red {
+    color: var(--red);
+    font-weight: 700;
+  }
 
   .led-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .led-card{background:#161616; border-radius:10px; padding:10px 12px;}
@@ -410,7 +417,9 @@
       title.textContent = '✕ Pas rentable pour l\'instant';
       const litresPourRentable = coutTrajet / Math.max(prixLocal - prixEtranger, 0.01);
       const litresSupp = Math.max(0, litresPourRentable - litresManquants);
-      tip.textContent = 'En achetant ' + litresSupp.toFixed(1) + ' L de plus sur place, le trajet devient rentable.';
+      
+      // Texte avec les litres en rouge et en gras
+      tip.innerHTML = 'En achetant <span class="highlight-red">' + litresSupp.toFixed(1) + ' L</span> de plus sur place, le trajet devient rentable.';
       tip.classList.remove('hidden');
 
       if(bonsPlans[pays]){
