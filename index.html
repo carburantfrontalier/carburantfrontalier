@@ -69,7 +69,6 @@
     background:var(--white);
   }
   
-  /* Style du menu de suggestions d'adresse */
   .autocomplete-wrapper { position: relative; }
   .autocomplete-results {
     position: absolute;
@@ -96,15 +95,14 @@
   .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
   .field{margin-bottom:16px;}
 
-  /* jauge */
   .gauge-wrap{margin-bottom:16px;}
   .gauge-value{font-size:20px; font-weight:600; margin-bottom:10px; font-family:'Space Grotesk',sans-serif;}
   .gauge-track{position:relative; height:6px; border-radius:3px; background:var(--border); margin:0 4px 6px;}
-  .gauge-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--black); width:12.5%;}
+  .gauge-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--black); width:50%;}
   .gauge-handle{
     position:absolute; top:50%; width:22px; height:22px; border-radius:50%;
     background:var(--yellow); border:3px solid var(--black);
-    transform:translate(-50%,-50%); cursor:grab; left:12.5%;
+    transform:translate(-50%,-50%); cursor:grab; left:50%;
   }
   input[type=range].gauge-input{
     -webkit-appearance:none; appearance:none; width:100%; height:22px;
@@ -127,7 +125,6 @@
   }
   button.primary:active{opacity:0.85;}
 
-  /* Textes des résultats plus grands */
   .result{border-radius:var(--radius); padding:18px; margin-top:6px;}
   .result.ok{background:#EAF3EF;}
   .result.bad{background:#F6E9E7;}
@@ -138,7 +135,6 @@
   .result-detail{font-size:14px; color:#444; margin:0; line-height:1.4;}
   .result-tip{font-size:15px; font-weight:500; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08); line-height:1.4;}
 
-  /* Accentuation rouge pour les litres à racheter */
   .highlight-red {
     color: var(--red);
     font-weight: 700;
@@ -168,39 +164,36 @@
 
 <main>
 
-  <!-- Bloc prix moyens officiels -->
   <div class="card">
     <p style="font-size:13px; font-weight:600; margin:0 0 10px;">Prix moyens officiels à l'étranger</p>
     <div class="led-grid">
       <div class="led-card">
         <p class="led-title">🇪🇸 ESPAGNE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-es-gazole">--.--</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-es-sp95">--.--</span></div>
+        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-es-gazole">1.49</span></div>
+        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-es-sp95">1.56</span></div>
       </div>
       <div class="led-card">
         <p class="led-title">🇮🇹 ITALIE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-it-gazole">--.--</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-it-sp95">--.--</span></div>
+        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-it-gazole">1.79</span></div>
+        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-it-sp95">1.71</span></div>
       </div>
       <div class="led-card">
         <p class="led-title">🇧🇪 BELGIQUE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-be-gazole">--.--</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-be-sp95">--.--</span></div>
+        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-be-gazole">1.68</span></div>
+        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-be-sp95">1.74</span></div>
       </div>
       <div class="led-card">
         <p class="led-title">🇱🇺 LUXEMBOURG</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-lu-gazole">--.--</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-lu-sp95">--.--</span></div>
+        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-lu-gazole">1.39</span></div>
+        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-lu-sp95">1.44</span></div>
       </div>
     </div>
-    <p style="font-size:10px; color:var(--grey); margin:10px 0 0;">Données issues de sources officielles, actualisées automatiquement.</p>
   </div>
 
-  <!-- Formulaire calcul -->
   <div class="card">
     <div class="field autocomplete-wrapper">
       <label for="depart">Où êtes-vous ?</label>
-      <input type="text" id="depart" placeholder="Tapez une adresse ou une ville..." value="Perpignan" autocomplete="off" />
+      <input type="text" id="depart" placeholder="Ex: 36 Place Cormontaigne Lille..." value="36 Place Cormontaigne 59000 Lille" autocomplete="off" />
       <div id="address-suggestions" class="autocomplete-results hidden"></div>
     </div>
 
@@ -222,7 +215,6 @@
         <option value="sp95">SP95</option>
         <option value="sp95e10">SP95-E10</option>
         <option value="sp98">SP98</option>
-        <option value="gpl">GPL</option>
       </select>
     </div>
 
@@ -242,15 +234,13 @@
     <div class="field">
       <label for="destination">Station de destination</label>
       <select id="destination">
-        <option value="jonquera" data-pays="Espagne" data-km="64" data-peage="7">La Jonquera, ES (Perpignan)</option>
-        <option value="perthus" data-pays="Espagne" data-km="56" data-peage="6">Le Perthus, ES (Perpignan)</option>
+        <option value="default">Chargement des stations...</option>
       </select>
     </div>
 
     <button class="primary" onclick="calculer()">Voir si ça vaut le coup</button>
   </div>
 
-  <!-- Résultat -->
   <div class="card hidden" id="result-card">
     <div class="result" id="result-box">
       <div class="result-title" id="result-title"></div>
@@ -264,100 +254,135 @@
 </main>
 
 <footer>
-  <p class="footer-name">CarburantFrontalier</p>
-  <p class="footer-tagline">Comparateur de rentabilité carburant pour frontaliers</p>
-  <p class="footer-links">
-    <a href="/">Mentions légales</a>·
-    <a href="/">Confidentialité</a>·
-    <a href="mailto:carburantfrontalier@gmail.com">Contact</a>
-  </p>
-  <p class="footer-copy">© 2026 CarburantFrontalier</p>
+  <p>© 2026 CarburantFrontalier</p>
 </footer>
 
 <script>
-  let livePrices = null;
+  let livePrices = {
+    ES: { gazole: 1.49, sp95: 1.56 },
+    IT: { gazole: 1.79, sp95: 1.71 },
+    BE: { gazole: 1.68, sp95: 1.74 },
+    LU: { gazole: 1.39, sp95: 1.44 }
+  };
 
-  // --- Autocomplétion dynamique d'adresse (API BAN gouv.fr) ---
+  const STATIONS_BDD = [
+    { name: "Menen, BE (Proche Lille)", pays: "Belgique", lat: 50.796, lon: 3.123, peage: 0 },
+    { name: "Mouscron, BE (Proche Tourcoing)", pays: "Belgique", lat: 50.742, lon: 3.218, peage: 0 },
+    { name: "Veurne, BE (Proche Dunkerque)", pays: "Belgique", lat: 51.072, lon: 2.662, peage: 0 },
+    { name: "Schengen, LU (Proche Thionville)", pays: "Luxembourg", lat: 49.470, lon: 6.365, peage: 0 },
+    { name: "Berchem, LU (Autoroute A3)", pays: "Luxembourg", lat: 49.538, lon: 6.126, peage: 0 },
+    { name: "La Jonquera, ES (Proche Perpignan)", pays: "Espagne", lat: 42.417, lon: 2.879, peage: 3.50 },
+    { name: "Le Perthus, ES (Proche Perpignan)", pays: "Espagne", lat: 42.464, lon: 2.863, peage: 0 },
+    { name: "Irun, ES (Proche Bayonne/Hendaye)", pays: "Espagne", lat: 43.338, lon: -1.788, peage: 2.50 },
+    { name: "Vintimille, IT (Proche Nice)", pays: "Italie", lat: 43.791, lon: 7.608, peage: 2.40 }
+  ];
+
+  function getDistanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    return Math.round(R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))) * 1.3);
+  }
+
+  function updateStationsForLocation(lat, lon) {
+    const destSelect = document.getElementById('destination');
+    destSelect.innerHTML = '';
+
+    const sorted = STATIONS_BDD.map(st => ({
+      ...st,
+      kmAR: getDistanceKm(lat, lon, st.lat, st.lon) * 2
+    })).sort((a, b) => a.kmAR - b.kmAR);
+
+    sorted.slice(0, 3).forEach(st => {
+      const opt = document.createElement('option');
+      opt.value = st.name;
+      opt.dataset.pays = st.pays;
+      opt.dataset.km = st.kmAR;
+      opt.dataset.peage = st.peage * 2;
+      opt.textContent = `${st.name} (~${st.kmAR} km A/R)`;
+      destSelect.appendChild(opt);
+    });
+  }
+
   const departInput = document.getElementById('depart');
   const suggestionsBox = document.getElementById('address-suggestions');
+  let debounceTimer;
 
-  departInput.addEventListener('input', async () => {
+  async function geocodeAddress(query) {
+    try {
+      const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
+      const data = await res.json();
+      return data.features || [];
+    } catch(e) { return []; }
+  }
+
+  departInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
     const query = departInput.value.trim();
+
     if (query.length < 3) {
       suggestionsBox.classList.add('hidden');
       return;
     }
 
-    try {
-      const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
-      const data = await res.json();
-      
-      if (data.features && data.features.length > 0) {
+    debounceTimer = setTimeout(async () => {
+      const features = await geocodeAddress(query);
+      if (features.length > 0) {
+        // Auto-mise à jour avec le 1er résultat
+        const [lon, lat] = features[0].geometry.coordinates;
+        updateStationsForLocation(lat, lon);
+
+        // Remplir le menu déroulant d'autocomplétion
         suggestionsBox.innerHTML = '';
-        data.features.forEach(feature => {
+        features.forEach(feature => {
           const div = document.createElement('div');
           div.className = 'autocomplete-item';
           div.textContent = feature.properties.label;
           div.addEventListener('click', () => {
             departInput.value = feature.properties.label;
             suggestionsBox.classList.add('hidden');
+            const [cLon, cLat] = feature.geometry.coordinates;
+            updateStationsForLocation(cLat, cLon);
           });
           suggestionsBox.appendChild(div);
         });
         suggestionsBox.classList.remove('hidden');
-      } else {
-        suggestionsBox.classList.add('hidden');
       }
-    } catch (e) {
-      console.log('Erreur autocomplétion');
-    }
+    }, 300);
   });
 
-  // Masquer les suggestions si on clique ailleurs
   document.addEventListener('click', (e) => {
     if (!departInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
       suggestionsBox.classList.add('hidden');
     }
   });
 
-  // --- Jauge dynamique ---
+  async function initDefaultLocation() {
+    const features = await geocodeAddress(departInput.value);
+    if (features.length > 0) {
+      const [lon, lat] = features[0].geometry.coordinates;
+      updateStationsForLocation(lat, lon);
+    }
+  }
+  initDefaultLocation();
+
+  // --- Jauge ---
   const gaugeInput = document.getElementById('gauge-input');
   const gaugeFill = document.getElementById('gauge-fill');
   const gaugeHandle = document.getElementById('gauge-handle');
   const gaugeLabel = document.getElementById('gauge-label');
   const fractions = ['Vide','1/8','1/4','3/8','1/2','5/8','3/4','7/8','Plein'];
 
-  function updateGauge(){
+  gaugeInput.addEventListener('input', () => {
     const val = parseInt(gaugeInput.value, 10);
     const pct = (val/8)*100;
     gaugeFill.style.width = pct + '%';
     gaugeHandle.style.left = pct + '%';
     gaugeLabel.textContent = fractions[val];
-  }
-  gaugeInput.addEventListener('input', updateGauge);
-  updateGauge();
-
-  // --- Chargement automatique des prix officiels ---
-  async function loadOfficialPrices(){
-    try {
-      const res = await fetch('/api/prices');
-      livePrices = await res.json();
-      
-      if(livePrices){
-        document.getElementById('led-es-gazole').textContent = livePrices.ES?.gazole || "1.49";
-        document.getElementById('led-es-sp95').textContent = livePrices.ES?.sp95 || "1.56";
-        document.getElementById('led-it-gazole').textContent = livePrices.IT?.gazole || "1.79";
-        document.getElementById('led-it-sp95').textContent = livePrices.IT?.sp95 || "1.71";
-        document.getElementById('led-be-gazole').textContent = livePrices.BE?.gazole || "1.68";
-        document.getElementById('led-be-sp95').textContent = livePrices.BE?.sp95 || "1.74";
-        document.getElementById('led-lu-gazole').textContent = livePrices.LU?.gazole || "1.39";
-        document.getElementById('led-lu-sp95').textContent = livePrices.LU?.sp95 || "1.44";
-      }
-    } catch(e) {
-      console.log("Erreur chargement prix officiels");
-    }
-  }
-  loadOfficialPrices();
+  });
 
   const bonsPlans = {
     'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55% en Espagne.',
@@ -366,7 +391,7 @@
     'Luxembourg': 'Bon à savoir : tabac -55%, carburant et alcools avantagés au Luxembourg.'
   };
 
-  async function calculer(){
+  function calculer(){
     const adresseDepart = document.getElementById('depart').value;
     const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value) || 0;
     const conso = parseFloat(document.getElementById('conso').value) || 0;
@@ -375,21 +400,18 @@
 
     const destSelect = document.getElementById('destination');
     const opt = destSelect.options[destSelect.selectedIndex];
-    const km = parseFloat(opt.dataset.km);
-    const peage = parseFloat(opt.dataset.peage);
+    if(!opt) return;
+
+    const km = parseFloat(opt.dataset.km) || 0;
+    const peage = parseFloat(opt.dataset.peage) || 0;
     const pays = opt.dataset.pays;
     const carburant = document.getElementById('carburant').value;
 
-    const prixFrance = { gazole: 1.72, sp95: 1.82, sp95e10: 1.79, sp98: 1.89, gpl: 0.98 };
+    const prixFrance = { gazole: 1.72, sp95: 1.82, sp95e10: 1.79, sp98: 1.89 };
     const prixLocal = prixFrance[carburant] || 1.80;
 
-    let prixEtranger = 1.50;
-    if(livePrices){
-      const codePays = pays === 'Espagne' ? 'ES' : (pays === 'Italie' ? 'IT' : (pays === 'Belgique' ? 'BE' : 'LU'));
-      if(livePrices[codePays]){
-        prixEtranger = parseFloat(livePrices[codePays][carburant.includes('sp') ? 'sp95' : 'gazole']);
-      }
-    }
+    const codePays = pays === 'Espagne' ? 'ES' : (pays === 'Italie' ? 'IT' : (pays === 'Belgique' ? 'BE' : 'LU'));
+    const prixEtranger = livePrices[codePays]?.[carburant.includes('sp') ? 'sp95' : 'gazole'] || 1.50;
 
     const coutTrajet = (km * conso / 100) * prixLocal + peage;
     const economiePlein = litresManquants * (prixLocal - prixEtranger);
@@ -418,7 +440,6 @@
       const litresPourRentable = coutTrajet / Math.max(prixLocal - prixEtranger, 0.01);
       const litresSupp = Math.max(0, litresPourRentable - litresManquants);
       
-      // Texte avec les litres en rouge et en gras
       tip.innerHTML = 'En achetant <span class="highlight-red">' + litresSupp.toFixed(1) + ' L</span> de plus sur place, le trajet devient rentable.';
       tip.classList.remove('hidden');
 
