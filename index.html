@@ -68,6 +68,31 @@
     font-family:inherit;
     background:var(--white);
   }
+  
+  /* Style du menu de suggestions d'adresse */
+  .autocomplete-wrapper { position: relative; }
+  .autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .autocomplete-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+  }
+  .autocomplete-item:last-child { border-bottom: none; }
+  .autocomplete-item:hover { background: var(--ecru); }
+
   .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
   .field{margin-bottom:16px;}
 
@@ -166,9 +191,10 @@
 
   <!-- Formulaire calcul -->
   <div class="card">
-    <div class="field">
+    <div class="field autocomplete-wrapper">
       <label for="depart">Où êtes-vous ?</label>
-      <input type="text" id="depart" placeholder="Adresse ou ville de départ" value="Perpignan" />
+      <input type="text" id="depart" placeholder="Tapez une adresse ou une ville..." value="Perpignan" autocomplete="off" />
+      <div id="address-suggestions" class="autocomplete-results hidden"></div>
     </div>
 
     <div class="row">
@@ -244,7 +270,50 @@
 <script>
   let livePrices = null;
 
-  // Jauge dynamique
+  // --- Autocomplétion dynamique d'adresse (API BAN gouv.fr) ---
+  const departInput = document.getElementById('depart');
+  const suggestionsBox = document.getElementById('address-suggestions');
+
+  departInput.addEventListener('input', async () => {
+    const query = departInput.value.trim();
+    if (query.length < 3) {
+      suggestionsBox.classList.add('hidden');
+      return;
+    }
+
+    try {
+      const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
+      const data = await res.json();
+      
+      if (data.features && data.features.length > 0) {
+        suggestionsBox.innerHTML = '';
+        data.features.forEach(feature => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.textContent = feature.properties.label;
+          div.addEventListener('click', () => {
+            departInput.value = feature.properties.label;
+            suggestionsBox.classList.add('hidden');
+          });
+          suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.classList.remove('hidden');
+      } else {
+        suggestionsBox.classList.add('hidden');
+      }
+    } catch (e) {
+      console.log('Erreur autocomplétion');
+    }
+  });
+
+  // Masquer les suggestions si on clique ailleurs
+  document.addEventListener('click', (e) => {
+    if (!departInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      suggestionsBox.classList.add('hidden');
+    }
+  });
+
+  // --- Jauge dynamique ---
   const gaugeInput = document.getElementById('gauge-input');
   const gaugeFill = document.getElementById('gauge-fill');
   const gaugeHandle = document.getElementById('gauge-handle');
@@ -261,7 +330,7 @@
   gaugeInput.addEventListener('input', updateGauge);
   updateGauge();
 
-  // Chargement automatique des VRAIS prix depuis l'API officielle
+  // --- Chargement automatique des prix officiels ---
   async function loadOfficialPrices(){
     try {
       const res = await fetch('/api/prices');
@@ -278,7 +347,7 @@
         document.getElementById('led-lu-sp95').textContent = livePrices.LU?.sp95 || "1.44";
       }
     } catch(e) {
-      console.log("Erreur chargement prix officiels, repli sur tarifs moyens");
+      console.log("Erreur chargement prix officiels");
     }
   }
   loadOfficialPrices();
@@ -307,11 +376,12 @@
     const prixFrance = { gazole: 1.72, sp95: 1.82, sp95e10: 1.79, sp98: 1.89, gpl: 0.98 };
     const prixLocal = prixFrance[carburant] || 1.80;
 
-    // Récupération du VRAI prix officiel
     let prixEtranger = 1.50;
-    if(livePrices && livePrices[pays === 'Espagne' ? 'ES' : 'LU']){
+    if(livePrices){
       const codePays = pays === 'Espagne' ? 'ES' : (pays === 'Italie' ? 'IT' : (pays === 'Belgique' ? 'BE' : 'LU'));
-      prixEtranger = parseFloat(livePrices[codePays][carburant.includes('sp') ? 'sp95' : 'gazole']);
+      if(livePrices[codePays]){
+        prixEtranger = parseFloat(livePrices[codePays][carburant.includes('sp') ? 'sp95' : 'gazole']);
+      }
     }
 
     const coutTrajet = (km * conso / 100) * prixLocal + peage;
