@@ -331,11 +331,9 @@
     debounceTimer = setTimeout(async () => {
       const features = await geocodeAddress(query);
       if (features.length > 0) {
-        // Auto-mise à jour avec le 1er résultat
         const [lon, lat] = features[0].geometry.coordinates;
         updateStationsForLocation(lat, lon);
 
-        // Remplir le menu déroulant d'autocomplétion
         suggestionsBox.innerHTML = '';
         features.forEach(feature => {
           const div = document.createElement('div');
@@ -396,16 +394,20 @@
     const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value) || 0;
     const conso = parseFloat(document.getElementById('conso').value) || 0;
     const niveauFraction = parseInt(gaugeInput.value, 10) / 8;
-    const litresManquants = reservoirCap * (1 - niveauFraction);
+    
+    let litresActuels = reservoirCap * niveauFraction;
 
     const destSelect = document.getElementById('destination');
     const opt = destSelect.options[destSelect.selectedIndex];
     if(!opt) return;
 
-    const km = parseFloat(opt.dataset.km) || 0;
+    const kmAR = parseFloat(opt.dataset.km) || 0;
+    const kmAller = kmAR / 2;
     const peage = parseFloat(opt.dataset.peage) || 0;
     const pays = opt.dataset.pays;
     const carburant = document.getElementById('carburant').value;
+
+    const consoAller = (kmAller * conso) / 100;
 
     const prixFrance = { gazole: 1.72, sp95: 1.82, sp95e10: 1.79, sp98: 1.89 };
     const prixLocal = prixFrance[carburant] || 1.80;
@@ -413,8 +415,25 @@
     const codePays = pays === 'Espagne' ? 'ES' : (pays === 'Italie' ? 'IT' : (pays === 'Belgique' ? 'BE' : 'LU'));
     const prixEtranger = livePrices[codePays]?.[carburant.includes('sp') ? 'sp95' : 'gazole'] || 1.50;
 
-    const coutTrajet = (km * conso / 100) * prixLocal + peage;
-    const economiePlein = litresManquants * (prixLocal - prixEtranger);
+    let appointFranceLitre = 0;
+    let coutAppointFrance = 0;
+    let alerteText = "";
+
+    // Marge de sécurité de 2 Litres pour l'aller
+    const besoinMinimum = consoAller + 2; 
+
+    if (litresActuels < besoinMinimum) {
+      appointFranceLitre = besoinMinimum - litresActuels;
+      coutAppointFrance = appointFranceLitre * prixLocal;
+      litresActuels += appointFranceLitre; 
+      
+      alerteText = `<br>⚠️ <b>Appoint obligatoire :</b> Vous devez remettre au moins <b>${appointFranceLitre.toFixed(1)} L</b> (${coutAppointFrance.toFixed(2)} €) en France pour faire l'aller en sécurité.`;
+    }
+
+    const litresPleinEtranger = reservoirCap - (litresActuels - consoAller);
+
+    const coutTrajet = (kmAR * conso / 100) * prixLocal + peage;
+    const economiePlein = litresPleinEtranger * (prixLocal - prixEtranger);
     const net = economiePlein - coutTrajet;
 
     const resultCard = document.getElementById('result-card');
@@ -430,15 +449,16 @@
     if(net >= 0){
       box.className = 'result ok';
       title.className = 'result-title ok';
-      title.textContent = '✓ Rentable';
+      title.textContent = '✓ Rentable' + (appointFranceLitre > 0 ? ' (avec appoint)' : '');
       tip.classList.add('hidden');
       bonsPlansEl.classList.add('hidden');
     } else {
       box.className = 'result bad';
       title.className = 'result-title bad';
-      title.textContent = '✕ Pas rentable pour l\'instant';
+      title.textContent = '✕ Pas rentable';
+      
       const litresPourRentable = coutTrajet / Math.max(prixLocal - prixEtranger, 0.01);
-      const litresSupp = Math.max(0, litresPourRentable - litresManquants);
+      const litresSupp = Math.max(0, litresPourRentable - litresPleinEtranger);
       
       tip.innerHTML = 'En achetant <span class="highlight-red">' + litresSupp.toFixed(1) + ' L</span> de plus sur place, le trajet devient rentable.';
       tip.classList.remove('hidden');
@@ -452,7 +472,7 @@
     }
 
     amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
-    detail.textContent = 'Depuis "' + adresseDepart + '" pour ' + litresManquants.toFixed(1) + ' L. Trajet (' + km + ' km A/R) et péage (' + peage.toFixed(2) + ' €) déduits.';
+    detail.innerHTML = 'Depuis "' + adresseDepart + '" pour ' + litresPleinEtranger.toFixed(1) + ' L à l\'étranger. Trajet (' + kmAR + ' km A/R) et péage déduits.' + alerteText;
     resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
 </script>
