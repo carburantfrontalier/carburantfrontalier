@@ -1,481 +1,532 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>CarburantFrontalier — Ça vaut le coup ?</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --yellow:#F6CE49;
-    --black:#161616;
-    --white:#FFFFFF;
-    --ecru:#F5F0E8;
-    --grey:#8A8A8A;
-    --green:#1F6F5C;
-    --red:#B3403A;
-    --border:#E3DCCB;
-    --radius:12px;
-    font-family:'Inter',system-ui,sans-serif;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--ecru);
-    color:var(--black);
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-  }
-  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculateur Carburant Frontalier</title>
+  <style>
+    :root {
+      --bg: #f5f4ef;
+      --card-bg: #ffffff;
+      --black: #111111;
+      --white: #ffffff;
+      --ecru: #f0eee6;
+      --grey: #666666;
+      --light-grey: #e2e0d8;
+      --red-bg: #fbebe8;
+      --red-text: #c0392b;
+      --green-bg: #eafaf1;
+      --green-text: #27ae60;
+      --radius: 12px;
+    }
 
-  header{
-    background:var(--white);
-    padding:16px 20px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    border-bottom:1px solid var(--border);
-  }
-  .logo{font-weight:700; font-size:18px; display:flex; align-items:center; gap:8px;}
-  .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--yellow);}
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-  .hero{
-    background:var(--yellow);
-    padding:32px 20px 40px;
-    text-align:center;
-  }
-  .hero h1{font-size:28px; line-height:1.15; margin-bottom:8px;}
-  .hero p{margin:0; color:#3a3a3a; font-size:14px;}
+    body {
+      background-color: var(--bg);
+      color: var(--black);
+      margin: 0;
+      padding: 20px 10px;
+      display: flex;
+      justify-content: center;
+    }
 
-  main{max-width:480px; margin:0 auto; padding:20px;}
+    .container {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-  .card{
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:20px;
-    margin-bottom:20px;
-  }
-  label{font-size:13px; color:#555; display:block; margin-bottom:6px;}
-  input[type=text], input[type=number], select{
-    width:100%;
-    padding:10px 12px;
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    font-size:14px;
-    font-family:inherit;
-    background:var(--white);
-  }
-  
-  .autocomplete-wrapper { position: relative; }
-  .autocomplete-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 0 0 var(--radius) var(--radius);
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .autocomplete-item {
-    padding: 10px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-  }
-  .autocomplete-item:last-child { border-bottom: none; }
-  .autocomplete-item:hover { background: var(--ecru); }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
 
-  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
-  .field{margin-bottom:16px;}
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+      position: relative;
+    }
 
-  .gauge-wrap{margin-bottom:16px;}
-  .gauge-value{font-size:20px; font-weight:600; margin-bottom:10px; font-family:'Space Grotesk',sans-serif;}
-  .gauge-track{position:relative; height:6px; border-radius:3px; background:var(--border); margin:0 4px 6px;}
-  .gauge-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--black); width:50%;}
-  .gauge-handle{
-    position:absolute; top:50%; width:22px; height:22px; border-radius:50%;
-    background:var(--yellow); border:3px solid var(--black);
-    transform:translate(-50%,-50%); cursor:grab; left:50%;
-  }
-  input[type=range].gauge-input{
-    -webkit-appearance:none; appearance:none; width:100%; height:22px;
-    background:transparent; margin:0; position:relative; z-index:2;
-  }
-  input[type=range].gauge-input::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px;}
-  .gauge-ticks{display:flex; justify-content:space-between; padding:0 2px; font-size:11px; color:var(--grey);}
+    .row {
+      display: flex;
+      gap: 12px;
+    }
 
-  button.primary{
-    width:100%;
-    padding:14px;
-    background:var(--black);
-    color:var(--white);
-    border:none;
-    border-radius:var(--radius);
-    font-size:15px;
-    font-weight:600;
-    font-family:inherit;
-    cursor:pointer;
-  }
-  button.primary:active{opacity:0.85;}
+    .row .field {
+      flex: 1;
+    }
 
-  .result{border-radius:var(--radius); padding:18px; margin-top:6px;}
-  .result.ok{background:#EAF3EF;}
-  .result.bad{background:#F6E9E7;}
-  .result-title{display:flex; align-items:center; gap:8px; font-weight:700; margin-bottom:6px; font-size:18px;}
-  .result-title.ok{color:var(--green);}
-  .result-title.bad{color:var(--red);}
-  .result-amount{font-family:'Space Grotesk',sans-serif; font-size:32px; font-weight:700; margin:0 0 4px;}
-  .result-detail{font-size:14px; color:#444; margin:0; line-height:1.4;}
-  .result-tip{font-size:15px; font-weight:500; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08); line-height:1.4;}
+    label {
+      font-size: 13px;
+      color: var(--grey);
+      font-weight: 500;
+    }
 
-  .highlight-red {
-    color: var(--red);
-    font-weight: 700;
-  }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--light-grey);
+      border-radius: 8px;
+      font-size: 15px;
+      background: var(--white);
+      outline: none;
+    }
 
-  .led-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .led-card{background:#161616; border-radius:10px; padding:10px 12px;}
-  .led-title{font-size:11px; color:#c9c9c9; font-weight:600; margin:0 0 6px;}
-  .led-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
-  .led-fuel{font-size:10px; color:#8a8a8a;}
-  .led-price{font-family:'Courier New',monospace; font-size:19px; font-weight:700; color:#ff3b30; text-shadow:0 0 6px rgba(255,59,48,0.5);}
+    input:focus, select:focus {
+      border-color: var(--black);
+    }
 
-  footer{text-align:center; padding:24px; font-size:12px; color:var(--grey);}
-  .hidden{display:none;}
-</style>
+    .btn-geoloc {
+      padding: 0 14px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-geoloc:hover {
+      opacity: 0.9;
+    }
+
+    .slider-container {
+      margin-top: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--black);
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--grey);
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+    }
+
+    .autocomplete-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 1px solid var(--light-grey);
+      border-radius: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .autocomplete-item {
+      padding: 10px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--ecru);
+    }
+
+    .autocomplete-item:hover {
+      background: var(--ecru);
+    }
+
+    .result-card.not-profitable {
+      background: var(--red-bg);
+      color: var(--black);
+    }
+
+    .result-card.profitable {
+      background: var(--green-bg);
+      color: var(--black);
+    }
+
+    .result-status {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .not-profitable .result-status { color: var(--red-text); }
+    .profitable .result-status { color: var(--green-text); }
+
+    .result-amount {
+      font-size: 32px;
+      font-weight: 800;
+      margin: 8px 0;
+    }
+
+    .not-profitable .result-amount { color: var(--red-text); }
+    .profitable .result-amount { color: var(--green-text); }
+
+    .result-desc {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #444;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .result-tip {
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    .highlight-red {
+      color: var(--red-text);
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .station-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--ecru);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="logo"><span class="logo-dot"></span> CarburantFrontalier</div>
-</header>
-
-<div class="hero">
-  <h1>Ça vaut le coup ?</h1>
-  <p>Comparez le plein chez vous et de l'autre côté de la frontière</p>
-</div>
-
-<main>
-
-  <div class="card">
-    <p style="font-size:13px; font-weight:600; margin:0 0 10px;">Prix moyens officiels à l'étranger</p>
-    <div class="led-grid">
-      <div class="led-card">
-        <p class="led-title">🇪🇸 ESPAGNE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-es-gazole">1.49</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-es-sp95">1.56</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇮🇹 ITALIE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-it-gazole">1.79</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-it-sp95">1.71</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇧🇪 BELGIQUE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-be-gazole">1.68</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-be-sp95">1.74</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇱🇺 LUXEMBOURG</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-lu-gazole">1.39</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-lu-sp95">1.44</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="field autocomplete-wrapper">
-      <label for="depart">Où êtes-vous ?</label>
-      <input type="text" id="depart" placeholder="Ex: 36 Place Cormontaigne Lille..." value="36 Place Cormontaigne 59000 Lille" autocomplete="off" />
-      <div id="address-suggestions" class="autocomplete-results hidden"></div>
-    </div>
-
-    <div class="row">
-      <div class="field" style="margin-bottom:0;">
-        <label for="reservoir-cap">Capacité réservoir (L)</label>
-        <input type="number" id="reservoir-cap" value="45" />
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label for="conso">Conso (L/100km)</label>
-        <input type="number" id="conso" value="4.5" step="0.1" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="carburant">Carburant</label>
-      <select id="carburant">
-        <option value="gazole">Gazole</option>
-        <option value="sp95">SP95</option>
-        <option value="sp95e10">SP95-E10</option>
-        <option value="sp98">SP98</option>
-      </select>
-    </div>
-
-    <div class="gauge-wrap">
-      <label>Niveau actuel du réservoir</label>
-      <div class="gauge-value" id="gauge-label">1/2</div>
-      <div style="position:relative;">
-        <div class="gauge-track">
-          <div class="gauge-fill" id="gauge-fill"></div>
-          <div class="gauge-handle" id="gauge-handle"></div>
-        </div>
-        <input type="range" class="gauge-input" id="gauge-input" min="0" max="8" step="1" value="4" style="position:absolute; top:-9px; left:0;" />
-      </div>
-      <div class="gauge-ticks"><span>Vide</span><span>1/4</span><span>1/2</span><span>3/4</span><span>Plein</span></div>
-    </div>
-
-    <div class="field">
-      <label for="destination">Station de destination</label>
-      <select id="destination">
-        <option value="default">Chargement des stations...</option>
-      </select>
-    </div>
-
-    <button class="primary" onclick="calculer()">Voir si ça vaut le coup</button>
-  </div>
-
-  <div class="card hidden" id="result-card">
-    <div class="result" id="result-box">
-      <div class="result-title" id="result-title"></div>
-      <p class="result-amount" id="result-amount"></p>
-      <p class="result-detail" id="result-detail"></p>
-      <p class="result-tip hidden" id="result-tip"></p>
-      <p class="result-tip hidden" id="result-bons-plans" style="border-top:none; padding-top:0;"></p>
-    </div>
-  </div>
-
-</main>
-
-<footer>
-  <p>© 2026 CarburantFrontalier</p>
-</footer>
-
-<script>
-  let livePrices = {
-    ES: { gazole: 1.49, sp95: 1.56 },
-    IT: { gazole: 1.79, sp95: 1.71 },
-    BE: { gazole: 1.68, sp95: 1.74 },
-    LU: { gazole: 1.39, sp95: 1.44 }
-  };
-
-  const STATIONS_BDD = [
-    { name: "Menen, BE (Proche Lille)", pays: "Belgique", lat: 50.796, lon: 3.123, peage: 0 },
-    { name: "Mouscron, BE (Proche Tourcoing)", pays: "Belgique", lat: 50.742, lon: 3.218, peage: 0 },
-    { name: "Veurne, BE (Proche Dunkerque)", pays: "Belgique", lat: 51.072, lon: 2.662, peage: 0 },
-    { name: "Schengen, LU (Proche Thionville)", pays: "Luxembourg", lat: 49.470, lon: 6.365, peage: 0 },
-    { name: "Berchem, LU (Autoroute A3)", pays: "Luxembourg", lat: 49.538, lon: 6.126, peage: 0 },
-    { name: "La Jonquera, ES (Proche Perpignan)", pays: "Espagne", lat: 42.417, lon: 2.879, peage: 3.50 },
-    { name: "Le Perthus, ES (Proche Perpignan)", pays: "Espagne", lat: 42.464, lon: 2.863, peage: 0 },
-    { name: "Irun, ES (Proche Bayonne/Hendaye)", pays: "Espagne", lat: 43.338, lon: -1.788, peage: 2.50 },
-    { name: "Vintimille, IT (Proche Nice)", pays: "Italie", lat: 43.791, lon: 7.608, peage: 2.40 }
-  ];
-
-  function getDistanceKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    return Math.round(R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))) * 1.3);
-  }
-
-  function updateStationsForLocation(lat, lon) {
-    const destSelect = document.getElementById('destination');
-    destSelect.innerHTML = '';
-
-    const sorted = STATIONS_BDD.map(st => ({
-      ...st,
-      kmAR: getDistanceKm(lat, lon, st.lat, st.lon) * 2
-    })).sort((a, b) => a.kmAR - b.kmAR);
-
-    sorted.slice(0, 3).forEach(st => {
-      const opt = document.createElement('option');
-      opt.value = st.name;
-      opt.dataset.pays = st.pays;
-      opt.dataset.km = st.kmAR;
-      opt.dataset.peage = st.peage * 2;
-      opt.textContent = `${st.name} (~${st.kmAR} km A/R)`;
-      destSelect.appendChild(opt);
-    });
-  }
-
-  const departInput = document.getElementById('depart');
-  const suggestionsBox = document.getElementById('address-suggestions');
-  let debounceTimer;
-
-  async function geocodeAddress(query) {
-    try {
-      const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
-      const data = await res.json();
-      return data.features || [];
-    } catch(e) { return []; }
-  }
-
-  departInput.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    const query = departInput.value.trim();
-
-    if (query.length < 3) {
-      suggestionsBox.classList.add('hidden');
-      return;
-    }
-
-    debounceTimer = setTimeout(async () => {
-      const features = await geocodeAddress(query);
-      if (features.length > 0) {
-        const [lon, lat] = features[0].geometry.coordinates;
-        updateStationsForLocation(lat, lon);
-
-        suggestionsBox.innerHTML = '';
-        features.forEach(feature => {
-          const div = document.createElement('div');
-          div.className = 'autocomplete-item';
-          div.textContent = feature.properties.label;
-          div.addEventListener('click', () => {
-            departInput.value = feature.properties.label;
-            suggestionsBox.classList.add('hidden');
-            const [cLon, cLat] = feature.geometry.coordinates;
-            updateStationsForLocation(cLat, cLon);
-          });
-          suggestionsBox.appendChild(div);
-        });
-        suggestionsBox.classList.remove('hidden');
-      }
-    }, 300);
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!departInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-      suggestionsBox.classList.add('hidden');
-    }
-  });
-
-  async function initDefaultLocation() {
-    const features = await geocodeAddress(departInput.value);
-    if (features.length > 0) {
-      const [lon, lat] = features[0].geometry.coordinates;
-      updateStationsForLocation(lat, lon);
-    }
-  }
-  initDefaultLocation();
-
-  // --- Jauge ---
-  const gaugeInput = document.getElementById('gauge-input');
-  const gaugeFill = document.getElementById('gauge-fill');
-  const gaugeHandle = document.getElementById('gauge-handle');
-  const gaugeLabel = document.getElementById('gauge-label');
-  const fractions = ['Vide','1/8','1/4','3/8','1/2','5/8','3/4','7/8','Plein'];
-
-  gaugeInput.addEventListener('input', () => {
-    const val = parseInt(gaugeInput.value, 10);
-    const pct = (val/8)*100;
-    gaugeFill.style.width = pct + '%';
-    gaugeHandle.style.left = pct + '%';
-    gaugeLabel.textContent = fractions[val];
-  });
-
-  const bonsPlans = {
-    'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55% en Espagne.',
-    'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30% en Italie.',
-    'Belgique': 'Bon à savoir : le tabac est environ -37% moins cher en Belgique.',
-    'Luxembourg': 'Bon à savoir : tabac -55%, carburant et alcools avantagés au Luxembourg.'
-  };
-
-  function calculer(){
-    const adresseDepart = document.getElementById('depart').value;
-    const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value) || 0;
-    const conso = parseFloat(document.getElementById('conso').value) || 0;
-    const niveauFraction = parseInt(gaugeInput.value, 10) / 8;
+  <div class="container">
     
-    let litresActuels = reservoirCap * niveauFraction;
-
-    const destSelect = document.getElementById('destination');
-    const opt = destSelect.options[destSelect.selectedIndex];
-    if(!opt) return;
-
-    const kmAR = parseFloat(opt.dataset.km) || 0;
-    const kmAller = kmAR / 2;
-    const peage = parseFloat(opt.dataset.peage) || 0;
-    const pays = opt.dataset.pays;
-    const carburant = document.getElementById('carburant').value;
-
-    const consoAller = (kmAller * conso) / 100;
-
-    const prixFrance = { gazole: 1.72, sp95: 1.82, sp95e10: 1.79, sp98: 1.89 };
-    const prixLocal = prixFrance[carburant] || 1.80;
-
-    const codePays = pays === 'Espagne' ? 'ES' : (pays === 'Italie' ? 'IT' : (pays === 'Belgique' ? 'BE' : 'LU'));
-    const prixEtranger = livePrices[codePays]?.[carburant.includes('sp') ? 'sp95' : 'gazole'] || 1.50;
-
-    let appointFranceLitre = 0;
-    let coutAppointFrance = 0;
-    let alerteText = "";
-
-    // Marge de sécurité de 2 Litres pour l'aller
-    const besoinMinimum = consoAller + 2; 
-
-    if (litresActuels < besoinMinimum) {
-      appointFranceLitre = besoinMinimum - litresActuels;
-      coutAppointFrance = appointFranceLitre * prixLocal;
-      litresActuels += appointFranceLitre; 
+    <!-- Formulaire principal -->
+    <div class="card">
       
-      alerteText = `<br>⚠️ <b>Appoint obligatoire :</b> Vous devez remettre au moins <b>${appointFranceLitre.toFixed(1)} L</b> (${coutAppointFrance.toFixed(2)} €) en France pour faire l'aller en sécurité.`;
+      <!-- Champ Adresse + Géolocalisation -->
+      <div class="field">
+        <label for="depart">Où êtes-vous ?</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="depart" placeholder="Ex: 65 Allée de l'Attique 34000 Montpellier" value="65 Allée de l'Attique 34000 Montpellier" autocomplete="off" />
+          <button type="button" id="btn-geoloc" class="btn-geoloc" title="Me géolocaliser">📍</button>
+        </div>
+        <div id="address-suggestions" class="autocomplete-results hidden"></div>
+      </div>
+
+      <!-- Réservoir & Consommation -->
+      <div class="row">
+        <div class="field">
+          <label for="capacite">Capacité réservoir (L)</label>
+          <input type="number" id="capacite" value="50" min="10" max="150" />
+        </div>
+        <div class="field">
+          <label for="conso">Conso (L/100km)</label>
+          <input type="number" id="conso" value="4.5" step="0.1" />
+        </div>
+      </div>
+
+      <!-- Carburant -->
+      <div class="field">
+        <label for="carburant">Carburant</label>
+        <select id="carburant">
+          <option value="gazole" selected>Gazole</option>
+          <option value="sp95">SP95</option>
+          <option value="sp95e10">SP95-E10</option>
+          <option value="sp98">SP98</option>
+        </select>
+      </div>
+
+      <!-- Niveau réservoir -->
+      <div class="field">
+        <label>Niveau actuel du réservoir</label>
+        <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;" id="level-display">1/4</div>
+        <div class="slider-container">
+          <input type="range" id="reservoir" min="0" max="1" step="0.25" value="0.25" />
+          <div class="slider-labels">
+            <span>Vide</span>
+            <span>1/4</span>
+            <span>1/2</span>
+            <span>3/4</span>
+            <span>Plein</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Station destination -->
+      <div class="field">
+        <label for="destination">Station de destination</label>
+        <select id="destination">
+          <option value="perthus">Le Perthus, ES (Proche Perpignan) (~396 km A/R)</option>
+          <option value="jonquera">La Jonquera, ES (Proche Perpignan) (~420 km A/R)</option>
+          <option value="behen">Béhennec / La Panne, BE (Proche Lille) (~140 km A/R)</option>
+          <option value="wasserbillig">Wasserbillig, LU (Proche Metz) (~120 km A/R)</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn-primary" id="btn-calculer">Voir si ça vaut le coup</button>
+    </div>
+
+    <!-- Carte Résultat -->
+    <div class="card result-card hidden" id="result-card">
+      <div class="result-status" id="result-status"></div>
+      <div class="result-amount" id="result-amount"></div>
+      <div class="result-desc" id="result-desc"></div>
+      <div class="result-tip" id="result-tip"></div>
+    </div>
+
+    <!-- Alternatives localement en France -->
+    <div class="card hidden" id="fr-stations-card">
+      <p style="font-size:13px; font-weight:700; margin:0 0 10px; color:var(--black);">
+        ⛽ Alternative : Stations les moins chères près de chez vous
+      </p>
+      <div id="fr-stations-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- DONNÉES SIMULÉES DE PRIX DES FRONTIÈRES ---
+    const DESTINATIONS = {
+      perthus: { nom: "Le Perthus, ES", distAR: 396, peageAR: 24.20, prixES: 1.289, prixFR: 1.689 },
+      jonquera: { nom: "La Jonquera, ES", distAR: 420, peageAR: 26.80, prixES: 1.269, prixFR: 1.689 },
+      behen: { nom: "La Panne, BE", distAR: 140, peageAR: 0, prixES: 1.549, prixFR: 1.689 },
+      wasserbillig: { nom: "Wasserbillig, LU", distAR: 120, peageAR: 0, prixES: 1.410, prixFR: 1.689 }
+    };
+
+    // --- AUTOCOMPLÉTION ADRESSE (API Data Gouv) ---
+    const inputDepart = document.getElementById('depart');
+    const suggestionsBox = document.getElementById('address-suggestions');
+
+    inputDepart.addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 4) {
+        suggestionsBox.classList.add('hidden');
+        return;
+      }
+      try {
+        const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=4`);
+        const data = await res.json();
+        suggestionsBox.innerHTML = '';
+        if (data.features && data.features.length > 0) {
+          data.features.forEach(feat => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.textContent = feat.properties.label;
+            div.addEventListener('click', () => {
+              inputDepart.value = feat.properties.label;
+              suggestionsBox.classList.add('hidden');
+            });
+            suggestionsBox.appendChild(div);
+          });
+          suggestionsBox.classList.remove('hidden');
+        } else {
+          suggestionsBox.classList.add('hidden');
+        }
+      } catch (err) {
+        suggestionsBox.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!inputDepart.contains(e.target) && !suggestionsBox.contains(e.target)) {
+        suggestionsBox.classList.add('hidden');
+      }
+    });
+
+    // --- GÉOLOCALISATION ---
+    document.getElementById('btn-geoloc').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert("La géolocalisation n'est pas supportée par votre navigateur.");
+        return;
+      }
+      inputDepart.value = "Géolocalisation en cours...";
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${lon}&lat=${lat}`);
+          const data = await res.json();
+          if (data.features && data.features.length > 0) {
+            inputDepart.value = data.features[0].properties.label;
+          }
+        } catch(e) {
+          inputDepart.value = "";
+        }
+      }, () => {
+        alert("Impossible de récupérer votre position.");
+        inputDepart.value = "";
+      });
+    });
+
+    // --- GESTION DU SLIDER RESERVOIR ---
+    const slider = document.getElementById('reservoir');
+    const display = document.getElementById('level-display');
+    const labelsMap = { "0": "Vide", "0.25": "1/4", "0.5": "1/2", "0.75": "3/4", "1": "Plein" };
+
+    slider.addEventListener('input', (e) => {
+      display.textContent = labelsMap[e.target.value] || e.target.value;
+    });
+
+    // --- CALCULS & RÉSULTATS ---
+    document.getElementById('btn-calculer').addEventListener('click', calculer);
+
+    async function calculer() {
+      const adresse = inputDepart.value || "Votre position";
+      const cap = parseFloat(document.getElementById('capacite').value) || 50;
+      const conso = parseFloat(document.getElementById('conso').value) || 5.0;
+      const fractionNiveau = parseFloat(slider.value);
+      const destKey = document.getElementById('destination').value;
+      const carburant = document.getElementById('carburant').value;
+      const dest = DESTINATIONS[destKey];
+
+      // Calculs volumétriques
+      const litreDepart = cap * fractionNiveau;
+      const consoAller = (dest.distAR / 2) * (conso / 100);
+      const litreArrivee = Math.max(0, litreDepart - consoAller);
+      const litreAchetable = Math.max(0, cap - litreArrivee);
+
+      // Calculs financiers
+      const coutRoute = ((dest.distAR * (conso / 100)) * dest.prixFR) + dest.peageAR;
+      const economieCarburant = litreAchetable * (dest.prixFR - dest.prixES);
+      const bilan = economieCarburant - coutRoute;
+
+      // Affichage des éléments du résultat
+      const card = document.getElementById('result-card');
+      const statusEl = document.getElementById('result-status');
+      const amountEl = document.getElementById('result-amount');
+      const descEl = document.getElementById('result-desc');
+      const tipEl = document.getElementById('result-tip');
+
+      card.classList.remove('hidden', 'not-profitable', 'profitable');
+
+      if (bilan < 0) {
+        card.classList.add('not-profitable');
+        statusEl.innerHTML = '✕ Pas rentable';
+        amountEl.textContent = `${bilan.toFixed(2)} €`;
+        descEl.textContent = `Depuis "${adresse}" pour ${litreAchetable.toFixed(1)} L à l'étranger. Trajet (${dest.distAR} km A/R) et péage déduits.`;
+
+        // Volume supplémentaire à ramener en jerrican pour atteindre la rentabilité
+        const manqueAEncaisser = Math.abs(bilan);
+        const gainParLitre = dest.prixFR - dest.prixES;
+        const jerricanL = manqueAEncaisser / gainParLitre;
+
+        tipEl.innerHTML = `💡 Pour rendre le trajet rentable, vous devez <b>faire le plein</b> et ramener au moins <span class="highlight-red">${jerricanL.toFixed(1)} L en jerrican</span>.`;
+      } else {
+        card.classList.add('profitable');
+        statusEl.innerHTML = '✓ Trajet rentable !';
+        amountEl.textContent = `+${bilan.toFixed(2)} €`;
+        descEl.textContent = `Depuis "${adresse}" en faisant un plein de ${litreAchetable.toFixed(1)} L à l'étranger.`;
+        tipEl.textContent = `🎉 Vous économisez ${bilan.toFixed(2)} € nette(s) par rapport à un plein fait directement en France !`;
+      }
+
+      // Recherche des alternatives en France à proximité
+      chargerStationsFranceProches(adresse, carburant);
     }
 
-    const litresPleinEtranger = reservoirCap - (litresActuels - consoAller);
+    // --- RECHERCHE DES STATIONS MOINS CHÈRES EN FRANCE ---
+    async function chargerStationsFranceProches(adresse, carburant) {
+      const container = document.getElementById('fr-stations-list');
+      const card = document.getElementById('fr-stations-card');
+      container.innerHTML = '<span style="font-size:12px; color:#666;">Recherche des stations à proximité...</span>';
+      card.classList.remove('hidden');
 
-    const coutTrajet = (kmAR * conso / 100) * prixLocal + peage;
-    const economiePlein = litresPleinEtranger * (prixLocal - prixEtranger);
-    const net = economiePlein - coutTrajet;
+      try {
+        // Géocodage de l'adresse renseignée
+        const geoRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(adresse)}&limit=1`);
+        const geoData = await geoRes.json();
+        
+        if (!geoData.features || geoData.features.length === 0) {
+          card.classList.add('hidden');
+          return;
+        }
 
-    const resultCard = document.getElementById('result-card');
-    const box = document.getElementById('result-box');
-    const title = document.getElementById('result-title');
-    const amount = document.getElementById('result-amount');
-    const detail = document.getElementById('result-detail');
-    const tip = document.getElementById('result-tip');
-    const bonsPlansEl = document.getElementById('result-bons-plans');
+        const [lon, lat] = geoData.features[0].geometry.coordinates;
 
-    resultCard.classList.remove('hidden');
+        // Correspondance du carburant pour l'API OpenData
+        const fuelMap = { 'gazole': 'Gazeole', 'sp95': 'SP95', 'sp95e10': 'E10', 'sp98': 'SP98' };
+        const targetFuel = fuelMap[carburant] || 'Gazeole';
 
-    if(net >= 0){
-      box.className = 'result ok';
-      title.className = 'result-title ok';
-      title.textContent = '✓ Rentable' + (appointFranceLitre > 0 ? ' (avec appoint)' : '');
-      tip.classList.add('hidden');
-      bonsPlansEl.classList.add('hidden');
-    } else {
-      box.className = 'result bad';
-      title.className = 'result-title bad';
-      title.textContent = '✕ Pas rentable';
-      
-      const litresPourRentable = coutTrajet / Math.max(prixLocal - prixEtranger, 0.01);
-      const litresSupp = Math.max(0, litresPourRentable - litresPleinEtranger);
-      
-      tip.innerHTML = 'En achetant <span class="highlight-red">' + litresSupp.toFixed(1) + ' L</span> de plus sur place, le trajet devient rentable.';
-      tip.classList.remove('hidden');
+        const url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom%2C%20GEOM'POINT(${lon}%20${lat})'%2C%2010km)&limit=15`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
 
-      if(bonsPlans[pays]){
-        bonsPlansEl.textContent = bonsPlans[pays];
-        bonsPlansEl.classList.remove('hidden');
-      } else {
-        bonsPlansEl.classList.add('hidden');
+        if (!data.results || data.results.length === 0) {
+          container.innerHTML = '<p style="font-size:12px; color:#666;">Aucune station disponible à moins de 10 km.</p>';
+          return;
+        }
+
+        const stations = data.results
+          .map(st => {
+            let price = null;
+            if (st.prix_valeur && st.prix_nom === targetFuel) {
+              price = parseFloat(st.prix_valeur);
+            }
+            return {
+              nom: st.pop || st.adresse || 'Station essence',
+              ville: st.ville || '',
+              prix: price,
+              adresse: st.adresse || ''
+            };
+          })
+          .filter(st => st.prix !== null && !isNaN(st.prix))
+          .sort((a, b) => a.prix - b.prix)
+          .slice(0, 3);
+
+        if (stations.length === 0) {
+          container.innerHTML = `<p style="font-size:12px; color:#666;">Aucune donnée de prix disponible pour le ${carburant.toUpperCase()} aux alentours.</p>`;
+          return;
+        }
+
+        container.innerHTML = '';
+        stations.forEach(st => {
+          const div = document.createElement('div');
+          div.className = 'station-item';
+          div.innerHTML = `
+            <div>
+              <strong>${st.nom}</strong>
+              <div style="font-size:11px; color:#666;">${st.adresse}, ${st.ville}</div>
+            </div>
+            <div style="font-weight:700; font-size:14px; color:var(--black);">${st.prix.toFixed(3)} €/L</div>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (e) {
+        container.innerHTML = '<p style="font-size:12px; color:#666;">Impossible de charger les stations de proximité.</p>';
       }
     }
-
-    amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
-    detail.innerHTML = 'Depuis "' + adresseDepart + '" pour ' + litresPleinEtranger.toFixed(1) + ' L à l\'étranger. Trajet (' + kmAR + ' km A/R) et péage déduits.' + alerteText;
-    resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
-  }
-</script>
-
+  </script>
 </body>
 </html>
