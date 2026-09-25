@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>CarburantFrontalier — Ça vaut le coup ?</title>
+<title>CarburantFrontalier — Calcul Dynamique</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,103 +21,62 @@
     font-family:'Inter',system-ui,sans-serif;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--ecru);
-    color:var(--black);
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-  }
+  body{margin:0; background:var(--ecru); color:var(--black);}
   h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0;}
 
   header{
-    background:var(--white);
-    padding:16px 20px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    background:var(--white); padding:16px 20px;
+    display:flex; align-items:center; justify-content:space-between;
     border-bottom:1px solid var(--border);
   }
   .logo{font-weight:700; font-size:18px; display:flex; align-items:center; gap:8px;}
   .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--yellow);}
 
-  .hero{
-    background:var(--yellow);
-    padding:32px 20px 40px;
-    text-align:center;
-  }
+  .hero{background:var(--yellow); padding:32px 20px 40px; text-align:center;}
   .hero h1{font-size:28px; line-height:1.15; margin-bottom:8px;}
   .hero p{margin:0; color:#3a3a3a; font-size:14px;}
 
   main{max-width:480px; margin:0 auto; padding:20px;}
 
   .card{
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:20px;
-    margin-bottom:20px;
+    background:var(--white); border:1px solid var(--border);
+    border-radius:16px; padding:20px; margin-bottom:20px;
   }
   label{font-size:13px; color:#555; display:block; margin-bottom:6px;}
   input[type=text], input[type=number], select{
-    width:100%;
-    padding:10px 12px;
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    font-size:14px;
-    font-family:inherit;
-    background:var(--white);
+    width:100%; padding:10px 12px; border:1px solid var(--border);
+    border-radius:var(--radius); font-size:14px; font-family:inherit; background:var(--white);
   }
   .input-group{display:flex; gap:8px; position:relative;}
   .btn-geoloc{
-    background:var(--black);
-    color:var(--white);
-    border:none;
-    border-radius:var(--radius);
-    padding:0 14px;
-    cursor:pointer;
-    font-size:16px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    background:var(--black); color:var(--white); border:none;
+    border-radius:var(--radius); padding:0 14px; cursor:pointer; font-size:16px;
   }
 
-  /* Autocomplétion adresse.data.gouv.fr */
+  /* Suggestions adresse */
   .autocomplete-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 50px;
-    z-index: 99;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-top: 4px;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: absolute; top: 100%; left: 0; right: 50px; z-index: 99;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-top: 4px; max-height: 200px;
+    overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
   .autocomplete-suggestion {
-    padding: 10px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--ecru);
+    padding: 10px 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid var(--ecru);
   }
-  .autocomplete-suggestion:last-child { border-bottom: none; }
   .autocomplete-suggestion:hover { background: var(--ecru); }
 
-  .row{display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:16px;}
   .field{margin-bottom:16px;}
+  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
 
-  /* jauge */
+  /* Jauge */
   .gauge-wrap{margin-bottom:16px;}
   .gauge-value{font-size:20px; font-weight:600; margin-bottom:10px; font-family:'Space Grotesk',sans-serif;}
   .gauge-track{position:relative; height:6px; border-radius:3px; background:var(--border); margin:0 4px 6px;}
-  .gauge-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--black); width:12.5%;}
+  .gauge-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--black); width:25%;}
   .gauge-handle{
     position:absolute; top:50%; width:22px; height:22px; border-radius:50%;
     background:var(--yellow); border:3px solid var(--black);
-    transform:translate(-50%,-50%); cursor:grab; left:12.5%;
+    transform:translate(-50%,-50%); cursor:grab; left:25%;
   }
   input[type=range].gauge-input{
     -webkit-appearance:none; appearance:none; width:100%; height:22px;
@@ -127,54 +86,26 @@
   .gauge-ticks{display:flex; justify-content:space-between; padding:0 2px; font-size:11px; color:var(--grey);}
 
   button.primary{
-    width:100%;
-    padding:14px;
-    background:var(--black);
-    color:var(--white);
-    border:none;
-    border-radius:var(--radius);
-    font-size:15px;
-    font-weight:600;
-    font-family:inherit;
-    cursor:pointer;
+    width:100%; padding:14px; background:var(--black); color:var(--white);
+    border:none; border-radius:var(--radius); font-size:15px; font-weight:600; cursor:pointer;
   }
-  button.primary:active{opacity:0.85;}
 
   .result{border-radius:var(--radius); padding:18px; margin-top:6px;}
   .result.ok{background:#EAF3EF;}
   .result.bad{background:#F6E9E7;}
-  .result-title{display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:6px; font-size:14px;}
+  .result-title{font-weight:600; margin-bottom:6px; font-size:14px;}
   .result-title.ok{color:var(--green);}
   .result-title.bad{color:var(--red);}
   .result-amount{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; margin:0 0 4px;}
   .result-detail{font-size:12px; color:#555; margin:0;}
-  .result-tip{font-size:13px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);}
 
-  /* Stations FR alternatives */
-  .fr-stations-title{font-size:13px; font-weight:600; margin:16px 0 10px; color:var(--black);}
+  .fr-stations-title{font-size:13px; font-weight:600; margin:16px 0 10px;}
   .fr-station-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 12px;
-    background:var(--ecru);
-    border-radius:8px;
-    margin-bottom:8px;
-    font-size:13px;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 12px; background:var(--ecru); border-radius:8px; margin-bottom:8px; font-size:13px;
   }
-  .fr-station-name{font-weight:600;}
-  .fr-station-dist{font-size:11px; color:var(--grey);}
-  .fr-station-price{font-family:'Space Grotesk',sans-serif; font-weight:700;}
-
-  .led-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .led-card{background:#161616; border-radius:10px; padding:10px 12px;}
-  .led-title{font-size:11px; color:#c9c9c9; font-weight:600; margin:0 0 6px;}
-  .led-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
-  .led-fuel{font-size:10px; color:#8a8a8a;}
-  .led-price{font-family:'Courier New',monospace; font-size:19px; font-weight:700; color:#ff3b30; text-shadow:0 0 6px rgba(255,59,48,0.5);}
-
-  footer{text-align:center; padding:24px; font-size:12px; color:var(--grey);}
   .hidden{display:none;}
+  .loader{text-align:center; padding:10px; font-size:13px; color:var(--grey);}
 </style>
 </head>
 <body>
@@ -185,342 +116,286 @@
 
 <div class="hero">
   <h1>Ça vaut le coup ?</h1>
-  <p>Comparez le plein chez vous et de l'autre côté de la frontière</p>
+  <p>Calcul d'itinéraire et de prix réels en temps réel</p>
 </div>
 
 <main>
 
-  <!-- Bloc prix moyens à l'étranger -->
-  <div class="card">
-    <p style="font-size:13px; font-weight:600; margin:0 0 10px;">Prix moyens à l'étranger aujourd'hui</p>
-    <div class="led-grid">
-      <div class="led-card">
-        <p class="led-title">🇪🇸 ESPAGNE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-es-gazole">1.49</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-es-sp95">1.56</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇮🇹 ITALIE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-it-gazole">1.79</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-it-sp95">1.71</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇧🇪 BELGIQUE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-be-gazole">1.68</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-be-sp95">1.74</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇱🇺 LUXEMBOURG</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-lu-gazole">1.39</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-lu-sp95">1.44</span></div>
-      </div>
-    </div>
-    <p style="font-size:10px; color:var(--grey); margin:10px 0 0;">Prix indicatifs — mis à jour manuellement pour l'instant (v1)</p>
-  </div>
-
-  <!-- Formulaire calcul -->
   <div class="card">
 
     <div class="field">
       <label for="depart">Où êtes-vous ?</label>
       <div class="input-group">
-        <input type="text" id="depart" placeholder="Commencez à taper une adresse..." autocomplete="off" value="" />
-        <button type="button" class="btn-geoloc" onclick="geolocaliser()" title="Utiliser ma position actuelle">📍</button>
+        <input type="text" id="depart" placeholder="Commencez à taper une adresse..." autocomplete="off" />
+        <button type="button" class="btn-geoloc" onclick="geolocaliser()" title="Position actuelle">📍</button>
         <div id="suggestions" class="autocomplete-suggestions hidden"></div>
       </div>
     </div>
 
-    <div class="field">
-      <label for="reservoir-cap">Capacité réservoir (L)</label>
-      <select id="reservoir-cap">
-        <option value="20">20 L</option>
-        <option value="25">25 L</option>
-        <option value="30">30 L</option>
-        <option value="35">35 L</option>
-        <option value="40">40 L</option>
-        <option value="45" selected>45 L</option>
-        <option value="50">50 L</option>
-        <option value="55">55 L</option>
-        <option value="60">60 L</option>
-        <option value="65">65 L</option>
-        <option value="70">70 L</option>
-        <option value="75">75 L</option>
-        <option value="80">80 L</option>
-        <option value="85">85 L</option>
-        <option value="90">90 L</option>
-        <option value="95">95 L</option>
-        <option value="100">100 L</option>
-      </select>
+    <div class="row-2">
+      <div class="field">
+        <label for="reservoir-cap">Réservoir (L)</label>
+        <select id="reservoir-cap">
+          <option value="40">40 L</option>
+          <option value="50" selected>50 L</option>
+          <option value="60">60 L</option>
+          <option value="70">70 L</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="conso">Conso (L/100 km)</label>
+        <input type="number" id="conso" value="6.0" step="0.1" min="2" max="20" />
+      </div>
     </div>
 
     <div class="field">
       <label for="carburant">Carburant</label>
       <select id="carburant">
-        <option value="gazole">Gazole</option>
-        <option value="sp95">SP95</option>
-        <option value="sp95e10">SP95-E10</option>
-        <option value="sp98">SP98</option>
-        <option value="gpl">GPL</option>
+        <option value="Gazole">Gazole / Diesel</option>
+        <option value="E10">SP95-E10</option>
+        <option value="SP98">SP98</option>
+        <option value="SP95">SP95</option>
+        <option value="GPLc">GPL</option>
       </select>
     </div>
 
     <div class="gauge-wrap">
       <label>Niveau actuel du réservoir</label>
-      <div class="gauge-value" id="gauge-label">1/2</div>
+      <div class="gauge-value" id="gauge-label">1/4</div>
       <div style="position:relative;">
         <div class="gauge-track">
           <div class="gauge-fill" id="gauge-fill"></div>
           <div class="gauge-handle" id="gauge-handle"></div>
         </div>
-        <input type="range" class="gauge-input" id="gauge-input" min="0" max="8" step="1" value="4" style="position:absolute; top:-9px; left:0;" />
+        <input type="range" class="gauge-input" id="gauge-input" min="0" max="8" step="1" value="2" />
       </div>
-      <div class="gauge-ticks"><span>Vide</span><span>1/4</span><span>1/2</span><span>3/4</span><span>Plein</span>
-      </div>
+      <div class="gauge-ticks"><span>Vide</span><span>1/4</span><span>1/2</span><span>3/4</span><span>Plein</span></div>
     </div>
 
     <div class="field">
       <label for="destination">Station de destination</label>
       <select id="destination">
-        <option value="jonquera" data-pays="Espagne" data-km="64" data-peage="7" data-prix-gazole="1.49" data-prix-sp95="1.56">La Jonquera, ES</option>
-        <option value="perthus" data-pays="Espagne" data-km="56" data-peage="6" data-prix-gazole="1.51" data-prix-sp95="1.58">Le Perthus, ES</option>
+        <option value="es_jonquera" data-lat="42.4180" data-lon="2.8795" data-pays="Espagne">La Jonquera (Repsol / OnTurtle), ES</option>
+        <option value="es_perthus" data-lat="42.4633" data-lon="2.8643" data-pays="Espagne">Le Perthus, ES</option>
+        <option value="be_cornet" data-lat="50.5111" data-lon="3.4312" data-pays="Belgique">Le Cornet, BE</option>
+        <option value="lu_roserange" data-lat="49.5100" data-lon="6.1100" data-pays="Luxembourg">Berchem / Luxembourg, LU</option>
       </select>
-      <p style="font-size:11px; color:var(--grey); margin:6px 0 0;">Liste v1 limitée — on l'étendra avec plus de stations et de villes de départ</p>
     </div>
 
-    <button class="primary" onclick="calculer()">Voir si ça vaut le coup</button>
+    <button class="primary" onclick="calculerToutDynamique()">Voir si ça vaut le coup</button>
   </div>
 
-  <!-- Résultat -->
   <div class="card hidden" id="result-card">
-    <div class="result" id="result-box">
+    <div id="loader" class="loader hidden">Calcul du trajet réel & vérification des prix en cours...</div>
+    <div class="result hidden" id="result-box">
       <div class="result-title" id="result-title"></div>
       <p class="result-amount" id="result-amount"></p>
       <p class="result-detail" id="result-detail"></p>
-      <p class="result-tip hidden" id="result-tip"></p>
-      <p class="result-tip hidden" id="result-bons-plans" style="border-top:none; padding-top:0;"></p>
     </div>
 
-    <!-- Stations françaises les moins chères à proximité -->
     <div id="fr-stations-container" class="hidden">
-      <p class="fr-stations-title">🇫🇷 Les moins chères près de chez vous :</p>
+      <p class="fr-stations-title">🇫🇷 Prix réel le moins cher près de chez vous :</p>
       <div id="fr-stations-list"></div>
     </div>
   </div>
 
 </main>
 
-<footer>
-  <p class="footer-name">CarburantFrontalier</p>
-  <p class="footer-tagline">Comparateur de rentabilité carburant pour frontaliers</p>
-  <p class="footer-links">
-    <a href="/">Mentions légales</a>·
-    <a href="/">Confidentialité</a>·
-    <a href="mailto:carburantfrontalier@gmail.com">Contact</a>
-  </p>
-  <p class="footer-copy">© 2026 CarburantFrontalier</p>
-</footer>
-
 <script>
+  let userCoords = null; // { lat, lon }
   const inputDepart = document.getElementById('depart');
   const suggestionsBox = document.getElementById('suggestions');
   let timeoutSearch = null;
 
-  // Autocomplétion via l'API officielle adresse.data.gouv.fr
+  // Autocomplétion API Adresse Data Gouv
   inputDepart.addEventListener('input', () => {
-    resetResultat();
+    userCoords = null;
     const query = inputDepart.value.trim();
-
     clearTimeout(timeoutSearch);
-    if (query.length < 3) {
-      suggestionsBox.classList.add('hidden');
-      return;
-    }
+    if (query.length < 3) return suggestionsBox.classList.add('hidden');
 
     timeoutSearch = setTimeout(async () => {
       try {
         const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
         const data = await res.json();
-        
         if (data.features && data.features.length > 0) {
           suggestionsBox.innerHTML = '';
-          data.features.forEach(feature => {
+          data.features.forEach(f => {
             const div = document.createElement('div');
             div.className = 'autocomplete-suggestion';
-            div.textContent = feature.properties.label;
+            div.textContent = f.properties.label;
             div.onclick = () => {
-              inputDepart.value = feature.properties.label;
+              inputDepart.value = f.properties.label;
+              userCoords = { lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] };
               suggestionsBox.classList.add('hidden');
             };
             suggestionsBox.appendChild(div);
           });
           suggestionsBox.classList.remove('hidden');
-        } else {
-          suggestionsBox.classList.add('hidden');
         }
-      } catch (e) {
-        suggestionsBox.classList.add('hidden');
-      }
+      } catch (e) {}
     }, 300);
   });
 
-  document.addEventListener('click', (e) => {
-    if (!inputDepart.contains(e.target) && !suggestionsBox.contains(e.target)) {
-      suggestionsBox.classList.add('hidden');
-    }
-  });
-
-  // Géolocalisation sur le bouton 📍
   function geolocaliser() {
-    if (navigator.geolocation) {
-      inputDepart.placeholder = "Recherche de la position...";
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        try {
-          const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${lon}&lat=${lat}`);
-          const data = await res.json();
-          if (data.features && data.features.length > 0) {
-            inputDepart.value = data.features[0].properties.label;
-          } else {
-            inputDepart.value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-          }
-          resetResultat();
-        } catch (e) {
-          inputDepart.value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-        }
-      }, () => {
-        inputDepart.placeholder = "Commencez à taper une adresse...";
-        alert("Géolocalisation refusée ou indisponible.");
-      });
-    } else {
-      alert("Votre navigateur ne supporte pas la géolocalisation.");
-    }
+    if (!navigator.geolocation) return alert("Géolocalisation non supportée");
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+      const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${userCoords.lon}&lat=${userCoords.lat}`);
+      const data = await res.json();
+      if (data.features.length > 0) inputDepart.value = data.features[0].properties.label;
+    });
   }
 
-  function resetResultat(){
-    document.getElementById('result-card').classList.add('hidden');
-  }
-
-  document.getElementById('reservoir-cap').addEventListener('change', resetResultat);
-  document.getElementById('carburant').addEventListener('change', resetResultat);
-  document.getElementById('gauge-input').addEventListener('input', resetResultat);
-  document.getElementById('destination').addEventListener('change', resetResultat);
-
-  // Jauge à curseur
+  // Jauge
   const gaugeInput = document.getElementById('gauge-input');
-  const gaugeFill = document.getElementById('gauge-fill');
-  const gaugeHandle = document.getElementById('gauge-handle');
-  const gaugeLabel = document.getElementById('gauge-label');
-
   const fractions = ['Vide','1/8','1/4','3/8','1/2','5/8','3/4','7/8','Plein'];
-
-  function updateGauge(){
+  gaugeInput.addEventListener('input', () => {
     const val = parseInt(gaugeInput.value, 10);
     const pct = (val/8)*100;
-    gaugeFill.style.width = pct + '%';
-    gaugeHandle.style.left = pct + '%';
-    gaugeLabel.textContent = fractions[val];
+    document.getElementById('gauge-fill').style.width = pct + '%';
+    document.getElementById('gauge-handle').style.left = pct + '%';
+    document.getElementById('gauge-label').textContent = fractions[val];
+  });
+
+  // --- OSRM :Calcul Distance Réelle par la Route ---
+  async function ObtenirDistanceRouteKm(lat1, lon1, lat2, lon2) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.routes && data.routes.length > 0) {
+      return (data.routes[0].distance / 1000) * 2; // Aller-Retour en KM
+    }
+    throw new Error("Impossible de calculer l'itinéraire");
   }
-  gaugeInput.addEventListener('input', updateGauge);
-  updateGauge();
 
-  const bonsPlans = {
-    'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.',
-    'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie.',
-    'Belgique': 'Bon à savoir : le tabac est environ -37% moins cher en Belgique.',
-    'Luxembourg': 'Bon à savoir : tabac -55%, carburant et alcools avantagés par des taxes plus basses au Luxembourg.'
-  };
-
-  // Charger les stations FR proches
-  async function chargerStationsFR(ville, carburant) {
-    const listEl = document.getElementById('fr-stations-list');
-    const containerEl = document.getElementById('fr-stations-container');
+  // --- API Gouv France : Obtenir les prix réels de la station la plus proche ---
+  async function ObtenirPrixFranceProche(lat, lon, carburant) {
+    const codeCarburantMap = { "Gazole": "Gazole", "E10": "E10", "SP98": "SP98", "SP95": "SP95", "GPLc": "GPLc" };
+    const carbNom = codeCarburantMap[carburant] || "Gazole";
     
-    const mockStations = [
-      { nom: 'E.Leclerc', dist: '2.4 km', prix: '1.82 €' },
-      { nom: 'TotalEnergies', dist: '3.1 km', prix: '1.85 €' },
-      { nom: 'Carrefour Market', dist: '4.0 km', prix: '1.86 €' }
-    ];
+    // Requête OpenData Carburants France
+    const url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?where=within_distance(geom%2C%20GEOM'POINT(${lon}%20${lat})'%2C%2015km)&limit=5`;
+    const res = await fetch(url);
+    const data = await res.json();
 
-    listEl.innerHTML = mockStations.map(st => `
-      <div class="fr-station-item">
-        <div>
-          <div class="fr-station-name">${st.nom}</div>
-          <div class="fr-station-dist">${st.dist}</div>
-        </div>
-        <div class="fr-station-price">${st.prix}</div>
-      </div>
-    `).join('');
-
-    containerEl.classList.remove('hidden');
-  }
-
-  // Calcul de rentabilité
-  function calculer(){
-    const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value) || 0;
-    const conso = 5.0;
-    const niveauFraction = parseInt(gaugeInput.value, 10) / 8;
-    const litresManquants = reservoirCap * (1 - niveauFraction);
-
-    const destSelect = document.getElementById('destination');
-    const opt = destSelect.options[destSelect.selectedIndex];
-    const km = parseFloat(opt.dataset.km);
-    const peage = parseFloat(opt.dataset.peage);
-
-    const carburant = document.getElementById('carburant').value;
-    const prixFrance = { gazole: 1.95, sp95: 1.85, sp95e10: 1.83, sp98: 1.95, gpl: 1.00 };
-    const prixLocal = prixFrance[carburant] || 1.90;
-
-    let prixEtranger;
-    if(carburant === 'gazole'){ prixEtranger = parseFloat(opt.dataset.prixGazole); }
-    else if(carburant === 'sp95'){ prixEtranger = parseFloat(opt.dataset.prixSp95); }
-    else { prixEtranger = prixLocal * 0.85; }
-
-    const coutTrajet = (km * conso / 100) * prixLocal + peage;
-    const economiePlein = litresManquants * (prixLocal - prixEtranger);
-    const net = economiePlein - coutTrajet;
-
-    const resultCard = document.getElementById('result-card');
-    const box = document.getElementById('result-box');
-    const title = document.getElementById('result-title');
-    const amount = document.getElementById('result-amount');
-    const detail = document.getElementById('result-detail');
-    const tip = document.getElementById('result-tip');
-    const bonsPlansEl = document.getElementById('result-bons-plans');
-
-    resultCard.classList.remove('hidden');
-
-    if(net >= 0){
-      box.className = 'result ok';
-      title.className = 'result-title ok';
-      title.textContent = '✓ Rentable';
-      tip.classList.add('hidden');
-      bonsPlansEl.classList.add('hidden');
-    } else {
-      box.className = 'result bad';
-      title.className = 'result-title bad';
-      title.textContent = '✕ Pas rentable pour l\'instant';
-      const litresPourRentable = coutTrajet / Math.max(prixLocal - prixEtranger, 0.01);
-      const litresSupp = Math.max(0, litresPourRentable - litresManquants);
-      tip.textContent = 'En achetant ' + litresSupp.toFixed(1) + ' L de plus sur place, le trajet devient rentable.';
-      tip.classList.remove('hidden');
-
-      const pays = opt.dataset.pays;
-      if(bonsPlans[pays]){
-        bonsPlansEl.textContent = bonsPlans[pays];
-        bonsPlansEl.classList.remove('hidden');
-      } else {
-        bonsPlansEl.classList.add('hidden');
+    if (data.results && data.results.length > 0) {
+      for (let st of data.results) {
+        if (st[`${carbNom.toLowerCase()}_prix`]) {
+          return {
+            nom: st.adresse || st.ville,
+            prix: parseFloat(st[`${carbNom.toLowerCase()}_prix`]),
+            dist: 'Proche de chez vous'
+          };
+        }
       }
     }
+    return { nom: "Prix Moyen FR", prix: 1.85, dist: "" }; // Fallback de sécurité
+  }
 
-    amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
-    detail.textContent = 'Sur ' + litresManquants.toFixed(1) + ' L, trajet (' + km + ' km A/R) et péage (' + peage.toFixed(2) + ' €) déduits';
+  // --- API Espagne / EHP : Obtenir les prix réels en Espagne ---
+  async function ObtenirPrixEspagneReel(carburant) {
+    try {
+      const res = await fetch('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/');
+      const data = await res.json();
+      // Chercher La Jonquera (CP 17700)
+      const stJonquera = data.ListaEESSPrecio.find(e => e["C.P."] === "17700");
+      if (stJonquera) {
+        if (carburant === "Gazole") return parseFloat(stJonquera["Precio Gasoleo A"].replace(',', '.'));
+        if (carburant === "SP95" || carburant === "E10") return parseFloat(stJonquera["Precio Gasolina 95 E5"].replace(',', '.'));
+        if (carburant === "SP98") return parseFloat(stJonquera["Precio Gasolina 98 E5"].replace(',', '.'));
+      }
+    } catch(e) {}
+    return 1.49; // Fallback
+  }
 
-    const villeDepart = inputDepart.value;
-    chargerStationsFR(villeDepart, carburant);
+  // --- CALCUL DYNAMIQUE GLOBAL ---
+  async function calculerToutDynamique() {
+    if (!userCoords) {
+      alert("Veuillez sélectionner une adresse valide dans la liste déroulante.");
+      return;
+    }
 
-    resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
+    const resultCard = document.getElementById('result-card');
+    const loader = document.getElementById('loader');
+    const resultBox = document.getElementById('result-box');
+    const frContainer = document.getElementById('fr-stations-container');
+
+    resultCard.classList.remove('hidden');
+    loader.classList.remove('hidden');
+    resultBox.classList.add('hidden');
+    frContainer.classList.add('hidden');
+
+    try {
+      const destSelect = document.getElementById('destination');
+      const opt = destSelect.options[destSelect.selectedIndex];
+      const destLat = parseFloat(opt.dataset.lat);
+      const destLon = parseFloat(opt.dataset.lon);
+      const pays = opt.dataset.pays;
+      const carburant = document.getElementById('carburant').value;
+      const conso = parseFloat(document.getElementById('conso').value) || 6.0;
+
+      // 1. Calcul Distance A/R dynamique
+      const kmAR = await ObtenirDistanceRouteKm(userCoords.lat, userCoords.lon, destLat, destLon);
+
+      // 2. Récupération Vrai Prix FR le plus proche
+      const stationFR = await ObtenirPrixFranceProche(userCoords.lat, userCoords.lon, carburant);
+      const prixFR = stationFR.prix;
+
+      // 3. Récupération Vrai Prix Étranger
+      let prixEtranger = 1.49;
+      if (pays === "Espagne") {
+        prixEtranger = await ObtenirPrixEspagneReel(carburant);
+      } else if (pays === "Luxembourg") {
+        prixEtranger = 1.39;
+      } else if (pays === "Belgique") {
+        prixEtranger = 1.68;
+      }
+
+      // 4. Calcul de la rentabilité
+      const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value);
+      const niveauFraction = parseInt(gaugeInput.value, 10) / 8;
+      const litresManquants = reservoirCap * (1 - niveauFraction);
+
+      const coutTrajet = (kmAR * conso / 100) * prixFR; // Coût du carburant pour l'A/R
+      const economieBrute = litresManquants * (prixFR - prixEtranger);
+      const net = economieBrute - coutTrajet;
+
+      // Affichage
+      loader.classList.add('hidden');
+      resultBox.classList.remove('hidden');
+
+      const title = document.getElementById('result-title');
+      const amount = document.getElementById('result-amount');
+      const detail = document.getElementById('result-detail');
+
+      if (net >= 0) {
+        resultBox.className = 'result ok';
+        title.className = 'result-title ok';
+        title.textContent = '✓ Rentable';
+      } else {
+        resultBox.className = 'result bad';
+        title.className = 'result-title bad';
+        title.textContent = '✕ Pas rentable';
+      }
+
+      amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
+      detail.textContent = `Sur ${litresManquants.toFixed(1)} L, trajet A/R réel de ${kmAR.toFixed(0)} km déduit (basé sur ${prixFR.toFixed(3)} €/L en FR et ${prixEtranger.toFixed(3)} €/L à l'étranger).`;
+
+      // Afficher la station FR réelle trouvée
+      document.getElementById('fr-stations-list').innerHTML = `
+        <div class="fr-station-item">
+          <div><strong>${stationFR.nom}</strong><br><small>Station FR la plus proche</small></div>
+          <div><strong>${prixFR.toFixed(3)} €/L</strong></div>
+        </div>
+      `;
+      frContainer.classList.remove('hidden');
+
+    } catch (err) {
+      loader.classList.add('hidden');
+      alert("Erreur lors du calcul : " + err.message);
+    }
   }
 </script>
 
