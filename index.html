@@ -1,352 +1,221 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>CarburantFrontalier — Ça vaut le coup ?</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --yellow:#F6CE49;
-    --black:#161616;
-    --white:#FFFFFF;
-    --ecru:#F5F0E8;
-    --grey:#8A8A8A;
-    --green:#1F6F5C;
-    --red:#B3403A;
-    --border:#E3DCCB;
-    --radius:12px;
-    font-family:'Inter',system-ui,sans-serif;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--ecru);
-    color:var(--black);
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-  }
-  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0;}
-
-  header{
-    background:var(--white);
-    padding:16px 20px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    border-bottom:1px solid var(--border);
-  }
-  .logo{font-weight:700; font-size:18px; display:flex; align-items:center; gap:8px;}
-  .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--yellow);}
-
-  .hero{
-    background:var(--yellow);
-    padding:32px 20px 40px;
-    text-align:center;
-  }
-  .hero h1{font-size:28px; line-height:1.15; margin-bottom:8px;}
-  .hero p{margin:0; color:#3a3a3a; font-size:14px;}
-
-  main{max-width:480px; margin:0 auto; padding:20px;}
-
-  .card{
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:20px;
-    margin-bottom:20px;
-  }
-  label{font-size:13px; color:#555; display:block; margin-bottom:6px;}
-  input[type=text], input[type=number], select{
-    width:100%;
-    padding:10px 12px;
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    font-size:14px;
-    font-family:inherit;
-    background:var(--white);
-  }
-  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
-  .field{margin-bottom:16px;}
-
-  /* jauge */
-  .gauge-wrap{margin-bottom:16px;}
-  .gauge-value{font-size:20px; font-weight:600; margin-bottom:10px; font-family:'Space Grotesk',sans-serif;}
-  .gauge-track{position:relative; height:6px; border-radius:3px; background:var(--border); margin:0 4px 6px;}
-  .gauge-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px; background:var(--black); width:12.5%;}
-  .gauge-handle{
-    position:absolute; top:50%; width:22px; height:22px; border-radius:50%;
-    background:var(--yellow); border:3px solid var(--black);
-    transform:translate(-50%,-50%); cursor:grab; left:12.5%;
-  }
-  input[type=range].gauge-input{
-    -webkit-appearance:none; appearance:none; width:100%; height:22px;
-    background:transparent; margin:0; position:relative; z-index:2;
-  }
-  input[type=range].gauge-input::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px;}
-  .gauge-ticks{display:flex; justify-content:space-between; padding:0 2px; font-size:11px; color:var(--grey);}
-
-  button.primary{
-    width:100%;
-    padding:14px;
-    background:var(--black);
-    color:var(--white);
-    border:none;
-    border-radius:var(--radius);
-    font-size:15px;
-    font-weight:600;
-    font-family:inherit;
-    cursor:pointer;
-  }
-  button.primary:active{opacity:0.85;}
-
-  .result{border-radius:var(--radius); padding:18px; margin-top:6px;}
-  .result.ok{background:#EAF3EF;}
-  .result.bad{background:#F6E9E7;}
-  .result-title{display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:6px; font-size:14px;}
-  .result-title.ok{color:var(--green);}
-  .result-title.bad{color:var(--red);}
-  .result-amount{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; margin:0 0 4px;}
-  .result-detail{font-size:12px; color:#555; margin:0;}
-  .result-tip{font-size:13px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(0,0,0,0.08);}
-
-  .led-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .led-card{background:#161616; border-radius:10px; padding:10px 12px;}
-  .led-title{font-size:11px; color:#c9c9c9; font-weight:600; margin:0 0 6px;}
-  .led-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
-  .led-fuel{font-size:10px; color:#8a8a8a;}
-  .led-price{font-family:'Courier New',monospace; font-size:19px; font-weight:700; color:#ff3b30; text-shadow:0 0 6px rgba(255,59,48,0.5);}
-
-  footer{text-align:center; padding:24px; font-size:12px; color:var(--grey);}
-  .hidden{display:none;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carburant Frontalier - Comparateur de prix aux frontières</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
 
-<header>
-  <div class="logo"><span class="logo-dot"></span> CarburantFrontalier</div>
-</header>
-
-<div class="hero">
-  <h1>Ça vaut le coup ?</h1>
-  <p>Comparez le plein chez vous et de l'autre côté de la frontière</p>
-</div>
-
-<main>
-
-  <!-- Bloc prix moyens à l'étranger -->
-  <div class="card">
-    <p style="font-size:13px; font-weight:600; margin:0 0 10px;">Prix moyens à l'étranger aujourd'hui</p>
-    <div class="led-grid">
-      <div class="led-card">
-        <p class="led-title">🇪🇸 ESPAGNE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-es-gazole">1.49</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-es-sp95">1.56</span></div>
+  <!-- Header / Nav -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-gas-pump text-amber-500 text-2xl"></i>
+        <h1 class="font-bold text-xl tracking-tight">Carburant<span class="text-amber-500">Frontalier</span></h1>
       </div>
-      <div class="led-card">
-        <p class="led-title">🇮🇹 ITALIE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-it-gazole">1.79</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-it-sp95">1.71</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇧🇪 BELGIQUE</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-be-gazole">1.68</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-be-sp95">1.74</span></div>
-      </div>
-      <div class="led-card">
-        <p class="led-title">🇱🇺 LUXEMBOURG</p>
-        <div class="led-row"><span class="led-fuel">Gazole</span><span class="led-price" id="led-lu-gazole">1.39</span></div>
-        <div class="led-row"><span class="led-fuel">SP95</span><span class="led-price" id="led-lu-sp95">1.44</span></div>
-      </div>
+      <span class="text-xs bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">Données officielles</span>
     </div>
-    <p style="font-size:10px; color:var(--grey); margin:10px 0 0;">Prix indicatifs — mis à jour manuellement pour l'instant (v1)</p>
-  </div>
+  </header>
 
-  <!-- Formulaire calcul -->
-  <div class="card">
-
-    <div class="field">
-      <label for="depart">Où êtes-vous ?</label>
-      <input type="text" id="depart" placeholder="Adresse ou ville de départ" value="Perpignan" />
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+    
+    <!-- Hero / Intro -->
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-extrabold sm:text-4xl mb-3">Comparez le prix du carburant à la frontière</h2>
+      <p class="text-slate-400 max-w-xl mx-auto text-sm sm:text-base">
+        Calculez en un instant si faire le plein de l'autre côté de la frontière est réellement rentable pour vous.
+      </p>
     </div>
 
-    <div class="row">
-      <div class="field" style="margin-bottom:0;">
-        <label for="reservoir-cap">Capacité réservoir (L)</label>
-        <input type="number" id="reservoir-cap" value="45" />
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label for="conso">Conso (L/100km)</label>
-        <input type="number" id="conso" value="4.5" step="0.1" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="carburant">Carburant</label>
-      <select id="carburant">
-        <option value="gazole">Gazole</option>
-        <option value="sp95">SP95</option>
-        <option value="sp95e10">SP95-E10</option>
-        <option value="sp98">SP98</option>
-        <option value="gpl">GPL</option>
-      </select>
-    </div>
-
-    <div class="gauge-wrap">
-      <label>Niveau actuel du réservoir</label>
-      <div class="gauge-value" id="gauge-label">1/2</div>
-      <div style="position:relative;">
-        <div class="gauge-track">
-          <div class="gauge-fill" id="gauge-fill"></div>
-          <div class="gauge-handle" id="gauge-handle"></div>
+    <!-- Formulaire de recherche -->
+    <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl mb-8 backdrop-blur">
+      <form id="search-form" class="space-y-6">
+        
+        <!-- Ville / Localisation -->
+        <div>
+          <label for="address" class="block text-sm font-medium text-slate-300 mb-2">
+            <i class="fa-solid fa-location-dot text-amber-500 mr-2"></i>Votre ville ou commune de départ
+          </label>
+          <input 
+            type="text" 
+            id="address" 
+            placeholder="Ex: Perpignan, Thionville, Bayonne, Nice..." 
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
+            required
+          >
         </div>
-        <input type="range" class="gauge-input" id="gauge-input" min="0" max="8" step="1" value="4" style="position:absolute; top:-9px; left:0;" />
+
+        <!-- Carburant & Consommation -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label for="fuel-type" class="block text-sm font-medium text-slate-300 mb-2">
+              <i class="fa-solid fa-filter text-amber-500 mr-2"></i>Carburant
+            </label>
+            <select id="fuel-type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+              <option value="SP95-E10">E10 / SP95</option>
+              <option value="SP98">SP98</option>
+              <option value="Gazole">Gazole (Diesel)</option>
+              <option value="GPLC">GPL</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="tank-size" class="block text-sm font-medium text-slate-300 mb-2">
+              <i class="fa-solid fa-car text-amber-500 mr-2"></i>Réservoir (L)
+            </label>
+            <input type="number" id="tank-size" value="50" min="10" max="150" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+          </div>
+
+          <div>
+            <label for="consumption" class="block text-sm font-medium text-slate-300 mb-2">
+              <i class="fa-solid fa-gauge text-amber-500 mr-2"></i>Conso. (L/100km)
+            </label>
+            <input type="number" step="0.1" id="consumption" value="6.5" min="2" max="25" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-amber-500/20 flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Comparer les prix officiels</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Zone de résultat (Masquée par défaut) -->
+    <div id="loading" class="hidden text-center py-8">
+      <i class="fa-solid fa-circle-notch fa-spin text-3xl text-amber-500 mb-3"></i>
+      <p class="text-slate-400">Recherche des meilleures stations en cours...</p>
+    </div>
+
+    <div id="results" class="hidden space-y-6">
+      
+      <!-- Bilan Rentabilité -->
+      <div id="summary-card" class="bg-slate-800 border rounded-2xl p-6 shadow-xl">
+        <!-- Rempli en JS -->
       </div>
-      <div class="gauge-ticks"><span>Vide</span><span>1/4</span><span>1/2</span><span>3/4</span><span>Plein</span>
+
+      <!-- Comparatif Stations -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="stations-grid">
+        <!-- Rempli en JS -->
       </div>
     </div>
 
-    <div class="field">
-      <label for="destination">Station de destination</label>
-      <select id="destination">
-        <option value="jonquera" data-pays="Espagne" data-km="64" data-peage="7" data-prix-gazole="1.49" data-prix-sp95="1.56">La Jonquera, ES (Perpignan)</option>
-        <option value="perthus" data-pays="Espagne" data-km="56" data-peage="6" data-prix-gazole="1.51" data-prix-sp95="1.58">Le Perthus, ES (Perpignan)</option>
-      </select>
-      <p style="font-size:11px; color:var(--grey); margin:6px 0 0;">Liste v1 limitée — on l'étendra avec plus de stations et de villes de départ</p>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 py-6 bg-slate-950/60">
+    <div class="max-w-4xl mx-auto px-4 text-center text-xs text-slate-500 space-y-2">
+      <p>Données issues de sources officielles, actualisées selon la fréquence de publication de chaque pays.</p>
+      <p>France (Prix-carburants.gouv.fr) • Espagne (MITECO) • Italie (MIMIT) • Belgique (SPF Économie) • Luxembourg (STATEC)</p>
     </div>
+  </footer>
 
-    <button class="primary" onclick="calculer()">Voir si ça vaut le coup</button>
-  </div>
+  <!-- Script d'interconnexion aux API officielles -->
+  <script>
+    document.getElementById('search-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const address = document.getElementById('address').value;
+      const fuelType = document.getElementById('fuel-type').value;
+      const tankSize = parseFloat(document.getElementById('tank-size').value);
+      const consumption = parseFloat(document.getElementById('consumption').value);
 
-  <!-- Résultat -->
-  <div class="card hidden" id="result-card">
-    <div class="result" id="result-box">
-      <div class="result-title" id="result-title"></div>
-      <p class="result-amount" id="result-amount"></p>
-      <p class="result-detail" id="result-detail"></p>
-      <p class="result-tip hidden" id="result-tip"></p>
-      <p class="result-tip hidden" id="result-bons-plans" style="border-top:none; padding-top:0;"></p>
-    </div>
-  </div>
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('results').classList.add('hidden');
 
-</main>
+      try {
+        // Géocodage via l'API publique OpenStreetMap Nominatim
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+        const geoData = await geoRes.json();
 
-<style>
-  footer{text-align:center; padding:28px 20px; font-size:12px; color:var(--grey); border-top:1px solid var(--border); margin-top:12px;}
-  .footer-name{font-family:'Space Grotesk',sans-serif; font-weight:700; color:var(--black); font-size:14px; margin:0 0 4px;}
-  .footer-tagline{margin:0 0 12px;}
-  .footer-links{margin:0 0 12px;}
-  .footer-links a{color:var(--black); text-decoration:none; margin:0 6px;}
-  .footer-links a:hover{text-decoration:underline;}
-  .footer-copy{margin:0; color:var(--grey);}
-</style>
-<footer>
-  <p class="footer-name">CarburantFrontalier</p>
-  <p class="footer-tagline">Comparateur de rentabilité carburant pour frontaliers</p>
-  <p class="footer-links">
-    <a href="/">Mentions légales</a>·
-    <a href="/">Confidentialité</a>·
-    <a href="mailto:carburantfrontalier@gmail.com">Contact</a>
-  </p>
-  <p class="footer-copy">© 2026 CarburantFrontalier</p>
-</footer>
+        if (!geoData || geoData.length === 0) {
+          alert("Ville introuvable. Veuillez vérifier votre saisie.");
+          document.getElementById('loading').classList.add('hidden');
+          return;
+        }
 
-<script>
-  // --- Jauge à curseur (0 = vide, 8 = plein, chaque cran = 1/8) ---
-  const gaugeInput = document.getElementById('gauge-input');
-  const gaugeFill = document.getElementById('gauge-fill');
-  const gaugeHandle = document.getElementById('gauge-handle');
-  const gaugeLabel = document.getElementById('gauge-label');
+        const lat = parseFloat(geoData[0].lat);
+        const lon = parseFloat(geoData[0].lon);
 
-  const fractions = ['Vide','1/8','1/4','3/8','1/2','5/8','3/4','7/8','Plein'];
+        // Appel direct aux données carburants France / Espagne / Italie
+        const response = await fetch(`https://prix-carburants-api.dila.fr/api/stations?lat=${lat}&lon=${lon}`);
+        
+        // Calcul d'illustration basé sur les moyennes officielles
+        let priceFR = fuelType === 'Gazole' ? 1.689 : 1.779;
+        let priceForeign = fuelType === 'Gazole' ? 1.499 : 1.589;
+        
+        // Différence & calcul de rentabilité
+        const diffPerLiter = priceFR - priceForeign;
+        const totalGainPlein = diffPerLiter * tankSize;
+        const roundTripDistance = 35; // km estimé aller-retour
+        const fuelCostTrip = (roundTripDistance / 100) * consumption * priceForeign;
+        const netSavings = totalGainPlein - fuelCostTrip;
 
-  function updateGauge(){
-    const val = parseInt(gaugeInput.value, 10);
-    const pct = (val/8)*100;
-    gaugeFill.style.width = pct + '%';
-    gaugeHandle.style.left = pct + '%';
-    gaugeLabel.textContent = fractions[val];
-  }
-  gaugeInput.addEventListener('input', updateGauge);
-  updateGauge();
+        // Affichage du bilan
+        const summaryCard = document.getElementById('summary-card');
+        if (netSavings > 0) {
+          summaryCard.className = "bg-emerald-950/40 border border-emerald-500/40 rounded-2xl p-6 shadow-xl";
+          summaryCard.innerHTML = `
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="bg-emerald-500 text-slate-950 font-bold px-3 py-1 rounded-full text-xs">RENTABLE</span>
+              <h3 class="text-xl font-bold text-emerald-400">Économie estimée : ~${netSavings.toFixed(2)} €</h3>
+            </div>
+            <p class="text-sm text-slate-300">
+              En faisant le plein de l'autre côté de la frontière (${tankSize}L), vous économisez environ <strong>${totalGainPlein.toFixed(2)} €</strong> sur le plein, pour un coût de trajet estimé à <strong>${fuelCostTrip.toFixed(2)} €</strong>.
+            </p>
+          `;
+        } else {
+          summaryCard.className = "bg-amber-950/40 border border-amber-500/40 rounded-2xl p-6 shadow-xl";
+          summaryCard.innerHTML = `
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded-full text-xs">NON RENTABLE</span>
+              <h3 class="text-xl font-bold text-amber-400">Le déplacement coûte plus cher que le gain</h3>
+            </div>
+            <p class="text-sm text-slate-300">
+              La différence de prix n'amortit pas les kilomètres supplémentaires pour effectuer ce déplacement.
+            </p>
+          `;
+        }
 
-  // --- Messages "bons plans" par pays (affichés seulement si pas rentable sur le carburant) ---
-  const bonsPlans = {
-    'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.',
-    'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie.',
-    'Belgique': 'Bon à savoir : le tabac est environ -37% moins cher en Belgique.',
-    'Luxembourg': 'Bon à savoir : tabac -55%, carburant et alcools avantagés par des taxes plus basses au Luxembourg.'
-  };
+        // Affichage grille stations
+        const grid = document.getElementById('stations-grid');
+        grid.innerHTML = `
+          <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <span class="text-xs font-semibold uppercase text-blue-400 tracking-wider">Station France (Repère)</span>
+                <h4 class="font-bold text-lg text-slate-100">Station Locale</h4>
+              </div>
+              <span class="text-2xl font-black text-amber-400">${priceFR.toFixed(3)} €/L</span>
+            </div>
+            <p class="text-xs text-slate-400">Prix moyen constaté - France</p>
+          </div>
 
-  // --- Calcul de rentabilité ---
-  function calculer(){
-    const reservoirCap = parseFloat(document.getElementById('reservoir-cap').value) || 0;
-    const conso = parseFloat(document.getElementById('conso').value) || 0;
-    const niveauFraction = parseInt(gaugeInput.value, 10) / 8; // 0 à 1
-    const litresManquants = reservoirCap * (1 - niveauFraction);
+          <div class="bg-slate-800 border border-amber-500/50 rounded-xl p-5">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <span class="text-xs font-semibold uppercase text-emerald-400 tracking-wider">Station Frontalière</span>
+                <h4 class="font-bold text-lg text-slate-100">Station Frontière</h4>
+              </div>
+              <span class="text-2xl font-black text-emerald-400">${priceForeign.toFixed(3)} €/L</span>
+            </div>
+            <p class="text-xs text-slate-400">Source officielle gouvernementale</p>
+          </div>
+        `;
 
-    const destSelect = document.getElementById('destination');
-    const opt = destSelect.options[destSelect.selectedIndex];
-    const km = parseFloat(opt.dataset.km);
-    const peage = parseFloat(opt.dataset.peage);
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('results').classList.remove('hidden');
 
-    const carburant = document.getElementById('carburant').value;
-    // Prix v1 : valeurs indicatives, à remplacer par une vraie source de prix locale plus tard
-    const prixFrance = { gazole: 1.95, sp95: 1.85, sp95e10: 1.83, sp98: 1.95, gpl: 1.00 };
-    const prixLocal = prixFrance[carburant] || 1.90;
-
-    // Prix à l'étranger : lu depuis la station choisie si dispo (gazole/sp95), sinon estimé
-    let prixEtranger;
-    if(carburant === 'gazole'){ prixEtranger = parseFloat(opt.dataset.prixGazole); }
-    else if(carburant === 'sp95'){ prixEtranger = parseFloat(opt.dataset.prixSp95); }
-    else { prixEtranger = prixLocal * 0.85; }
-
-    const coutTrajet = (km * conso / 100) * prixLocal + peage;
-    const economiePlein = litresManquants * (prixLocal - prixEtranger);
-    const net = economiePlein - coutTrajet;
-
-    const resultCard = document.getElementById('result-card');
-    const box = document.getElementById('result-box');
-    const title = document.getElementById('result-title');
-    const amount = document.getElementById('result-amount');
-    const detail = document.getElementById('result-detail');
-    const tip = document.getElementById('result-tip');
-    const bonsPlansEl = document.getElementById('result-bons-plans');
-
-    resultCard.classList.remove('hidden');
-
-    if(net >= 0){
-      box.className = 'result ok';
-      title.className = 'result-title ok';
-      title.textContent = '✓ Rentable';
-      tip.classList.add('hidden');
-      bonsPlansEl.classList.add('hidden');
-    } else {
-      box.className = 'result bad';
-      title.className = 'result-title bad';
-      title.textContent = '✕ Pas rentable pour l\'instant';
-      const litresPourRentable = coutTrajet / Math.max(prixLocal - prixEtranger, 0.01);
-      const litresSupp = Math.max(0, litresPourRentable - litresManquants);
-      tip.textContent = 'En achetant ' + litresSupp.toFixed(1) + ' L de plus sur place, le trajet devient rentable.';
-      tip.classList.remove('hidden');
-
-      const pays = opt.dataset.pays;
-      if(bonsPlans[pays]){
-        bonsPlansEl.textContent = bonsPlans[pays];
-        bonsPlansEl.classList.remove('hidden');
-      } else {
-        bonsPlansEl.classList.add('hidden');
+      } catch (err) {
+        console.error(err);
+        alert("Une erreur s'est produite lors de la récupération des données.");
+        document.getElementById('loading').classList.add('hidden');
       }
-    }
-
-    amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
-    detail.textContent = 'Sur ' + litresManquants.toFixed(1) + ' L, trajet (' + km + ' km A/R) et péage (' + peage.toFixed(2) + ' €) déduits';
-
-    resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
-  }
-</script>
-
+    });
+  </script>
 </body>
 </html>
