@@ -6,114 +6,261 @@
   <title>Carburant Frontalier - Calculez votre rentabilité</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #1e293b;
-      --border: #e2e8f0;
+      --yellow: #FFD000;
+      --black: #000000;
+      --bg-ecru: #FBF9F1;
+      --card-bg: #FFFFFF;
+      --border-color: #000000;
+      --text-muted: #555555;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
+      background-color: var(--bg-ecru);
+      color: var(--black);
+      padding: 20px 12px;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
 
-    .container {
+    .app-container {
       width: 100%;
-      max-width: 600px;
+      max-width: 520px;
       background: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      padding: 24px;
+      border: 3px solid var(--black);
+      border-radius: 16px;
+      padding: 24px 20px;
+      box-shadow: 6px 6px 0px var(--black);
     }
 
     h1 {
-      font-size: 1.5rem;
-      color: var(--primary);
-      margin-top: 0;
-      margin-bottom: 20px;
+      font-size: 1.6rem;
+      font-weight: 900;
       text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      position: relative;
     }
 
     label {
       display: block;
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 0.95rem;
       margin-bottom: 6px;
-      font-size: 0.9rem;
     }
 
-    input, select {
+    input[type="text"],
+    input[type="number"],
+    select {
       width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 1rem;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
+      padding: 12px 14px;
       font-size: 1rem;
       font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    button:hover {
-      background-color: var(--primary-hover);
-    }
-
-    #results {
-      margin-top: 24px;
-      padding: 16px;
+      border: 2px solid var(--black);
       border-radius: 8px;
-      background: #f1f5f9;
+      background: #FFF;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      background-color: #FFFDF0;
+    }
+
+    /* Autocomplétion d'adresse */
+    .autocomplete-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #FFF;
+      border: 2px solid var(--black);
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      margin-top: 4px;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
       display: none;
+    }
+
+    .autocomplete-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #EEE;
+    }
+
+    .autocomplete-item:hover {
+      background-color: var(--yellow);
+      font-weight: 700;
+    }
+
+    /* Gauge de réservoir interactive */
+    .gauge-container {
+      margin-top: 10px;
+      background: #F3F3F3;
+      padding: 14px;
+      border: 2px solid var(--black);
+      border-radius: 10px;
+    }
+
+    .gauge-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .gauge-slider {
+      width: 100%;
+      accent-color: var(--black);
+      cursor: pointer;
+    }
+
+    .gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
+
+    /* Bouton principal */
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background-color: var(--black);
+      color: var(--yellow);
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      border: 2px solid var(--black);
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px var(--yellow);
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin-top: 10px;
+    }
+
+    .btn-submit:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--yellow);
+    }
+
+    /* Loader Ludique */
+    .loader-container {
+      display: none;
+      text-align: center;
+      padding: 20px 16px;
+      background: var(--bg-ecru);
+      border: 2px solid var(--black);
+      border-radius: 12px;
+      margin-top: 20px;
+      box-shadow: 4px 4px 0px var(--black);
+    }
+
+    .pump-anim {
+      font-size: 2.5rem;
+      animation: pumpBounce 0.8s infinite alternate ease-in-out;
+      margin-bottom: 8px;
+    }
+
+    @keyframes pumpBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .loading-text {
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+
+    .loading-subtext {
+      font-size: 0.88rem;
+      color: #333;
+      font-style: italic;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: #E5E7EB;
+      border: 2px solid var(--black);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--yellow);
+      transition: width 0.2s linear;
+    }
+
+    /* Cartes de résultats */
+    #results {
+      display: none;
+      margin-top: 24px;
     }
 
     .result-card {
-      background: white;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 10px;
-      border-left: 4px solid var(--primary);
+      background: #FFF;
+      border: 2px solid var(--black);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 3px 3px 0px var(--black);
     }
 
-    .error {
-      background-color: #fef2f2;
-      color: #991b1b;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 16px;
+    .result-card.highlight {
+      background: var(--yellow);
+    }
+
+    .error-box {
       display: none;
+      background: #FEE2E2;
+      border: 2px solid var(--black);
+      color: #991B1B;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Calculateur Carburant Frontalier</h1>
+<div class="app-container">
+  <h1>⛽ Carburant Frontalier</h1>
 
+  <!-- Adresse -->
   <div class="form-group">
-    <label for="address">Adresse de départ (France)</label>
-    <input type="text" id="address" placeholder="Ex: Perpignan, Toulouse, Lille...">
+    <label for="address">Adresse ou ville de départ (France)</label>
+    <input type="text" id="address" placeholder="Ex: Perpignan, Ax-les-Thermes, Lille..." autocomplete="off">
+    <div id="autocompleteResults" class="autocomplete-results"></div>
   </div>
 
+  <!-- Carburant -->
   <div class="form-group">
     <label for="carburant">Type de carburant</label>
     <select id="carburant">
@@ -124,85 +271,200 @@
     </select>
   </div>
 
-  <div class="form-group">
-    <label for="tank">Taille du réservoir (Litres)</label>
-    <input type="number" id="tank" value="50" min="10" max="150">
+  <!-- Réservoir & Consommation -->
+  <div class="form-group" style="display: flex; gap: 12px;">
+    <div style="flex: 1;">
+      <label for="tank">Capacité (L)</label>
+      <input type="number" id="tank" value="50" min="10" max="150">
+    </div>
+    <div style="flex: 1;">
+      <label for="consumption">Conso (L/100km)</label>
+      <input type="number" id="consumption" value="6.0" step="0.1" min="1">
+    </div>
   </div>
 
+  <!-- Jauge du réservoir -->
   <div class="form-group">
-    <label for="consumption">Consommation (L/100km)</label>
-    <input type="number" id="consumption" value="6.0" step="0.1" min="1">
+    <div class="gauge-container">
+      <div class="gauge-header">
+        <span>Niveau actuel du réservoir</span>
+        <span id="gaugeValue">1/4</span>
+      </div>
+      <input type="range" id="gaugeSlider" class="gauge-slider" min="0" max="1" step="0.25" value="0.25">
+      <div class="gauge-labels">
+        <span>Vide</span>
+        <span>1/4</span>
+        <span>1/2</span>
+        <span>3/4</span>
+        <span>Plein</span>
+      </div>
+    </div>
   </div>
 
-  <button id="calcBtn" onclick="calculate()">Voir si ça vaut le coup</button>
+  <!-- Bouton de calcul -->
+  <button class="btn-submit" id="calcBtn" onclick="calculate()">Voir si ça vaut le coup</button>
 
-  <div id="error" class="error"></div>
+  <!-- Loader Ludique -->
+  <div id="loader" class="loader-container">
+    <div class="pump-anim">⛽</div>
+    <div class="loading-text">Calcul de votre rentabilité en cours...</div>
+    <div class="loading-subtext">💡 N'oubliez pas que dans ces pays, les courses et les produits sont aussi moins chers qu'en France !</div>
+    <div class="progress-bar-bg">
+      <div id="progressBar" class="progress-bar-fill"></div>
+    </div>
+  </div>
 
+  <!-- Zone d'erreur -->
+  <div id="errorBox" class="error-box"></div>
+
+  <!-- Résultats -->
   <div id="results">
-    <h3>Résultats du calcul</h3>
-    <div id="resultsContent"></div>
+    <div class="result-card" id="cardFR"></div>
+    <div class="result-card" id="cardBorder"></div>
+    <div class="result-card highlight" id="cardSavings"></div>
   </div>
 </div>
 
 <script>
-  async function calculate() {
-    const address = document.getElementById('address').value;
-    const carburant = document.getElementById('carburant').value;
-    const tank = parseFloat(document.getElementById('tank').value);
-    const consumption = parseFloat(document.getElementById('consumption').value);
+  // --- Autocomplétion adresse.data.gouv.fr ---
+  const addressInput = document.getElementById('address');
+  const autocompleteResults = document.getElementById('autocompleteResults');
 
-    const errorDiv = document.getElementById('error');
-    const resultsDiv = document.getElementById('results');
-    const resultsContent = document.getElementById('resultsContent');
-
-    errorDiv.style.display = 'none';
-    resultsDiv.style.display = 'none';
-
-    if (!address) {
-      errorDiv.innerText = 'Veuillez saisir une adresse de départ.';
-      errorDiv.style.display = 'block';
+  addressInput.addEventListener('input', async () => {
+    const query = addressInput.value.trim();
+    if (query.length < 3) {
+      autocompleteResults.style.display = 'none';
       return;
     }
 
-    document.getElementById('calcBtn').innerText = 'Calcul en cours...';
+    try {
+      const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
+      const data = await res.json();
+      
+      autocompleteResults.innerHTML = '';
+      if (data.features && data.features.length > 0) {
+        data.features.forEach(feature => {
+          const item = document.createElement('div');
+          const label = feature.properties.label;
+          item.className = 'autocomplete-item';
+          item.innerText = label;
+          item.onclick = () => {
+            addressInput.value = label;
+            autocompleteResults.style.display = 'none';
+          };
+          autocompleteResults.appendChild(item);
+        });
+        autocompleteResults.style.display = 'block';
+      } else {
+        autocompleteResults.style.display = 'none';
+      }
+    } catch (e) {
+      autocompleteResults.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target !== addressInput) autocompleteResults.style.display = 'none';
+  });
+
+  // --- Jauge de réservoir ---
+  const gaugeSlider = document.getElementById('gaugeSlider');
+  const gaugeValue = document.getElementById('gaugeValue');
+  const gaugeLabels = { '0': 'Vide', '0.25': '1/4', '0.5': '1/2', '0.75': '3/4', '1': 'Plein' };
+
+  gaugeSlider.addEventListener('input', () => {
+    gaugeValue.innerText = gaugeLabels[gaugeSlider.value] || '1/4';
+  });
+
+  // --- Animation Loader ---
+  let loadingInterval;
+  function startLoader() {
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+    
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = '0%';
+    
+    let progress = 0;
+    loadingInterval = setInterval(() => {
+      progress += (100 / 250); // ~25 secondes de progression
+      if (progress > 92) progress = 92;
+      progressBar.style.width = `${progress}%`;
+    }, 100);
+  }
+
+  function stopLoader() {
+    clearInterval(loadingInterval);
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) progressBar.style.width = '100%';
+    setTimeout(() => {
+      document.getElementById('loader').style.display = 'none';
+    }, 200);
+  }
+
+  // --- Calcul de Rentabilité ---
+  async function calculate() {
+    const address = addressInput.value.trim();
+    const carburant = document.getElementById('carburant').value;
+    const tank = parseFloat(document.getElementById('tank').value);
+    const consumption = parseFloat(document.getElementById('consumption').value);
+    const currentGauge = parseFloat(gaugeSlider.value);
+
+    const errorBox = document.getElementById('errorBox');
+
+    if (!address) {
+      errorBox.innerText = 'Veuillez renseigner votre adresse de départ.';
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    startLoader();
 
     try {
-      // 1. Récupérer les prix côtés France & Andorre/Espagne/etc.
+      // Litres à rajouter pour faire le plein complet
+      const litresNeeded = tank * (1 - currentGauge);
+
+      // Appel simultané des APIs France & Andorre (ou pays frontalier)
       const [resFR, resAD] = await Promise.all([
-        fetch(`/api/prix-fr?carburant=${carburant}&address=${encodeURIComponent(address)}`).then(r => r.json()),
-        fetch(`/api/prix-ad?carburant=${carburant}`).then(r => r.json())
+        fetch(`/api/prix-fr?carburant=${carburant}&address=${encodeURIComponent(address)}`).then(r => r.json()).catch(() => ({ ok: false })),
+        fetch(`/api/prix-ad?carburant=${carburant}`).then(r => r.json()).catch(() => ({ ok: false }))
       ]);
 
       if (!resAD.ok) {
-        throw new Error(resAD.error || 'Erreur lors de la récupération des prix en Andorre.');
+        throw new Error("Impossible de récupérer les tarifs du pays frontalier. Réessayez dans quelques instants.");
       }
 
-      const priceFR = resFR.cheapest || 1.80; // Valeur par défaut si non trouvée
+      const priceFR = resFR.cheapest || 1.82;
       const priceAD = resAD.cheapest;
 
-      const totalFR = priceFR * tank;
-      const totalAD = priceAD * tank;
+      const totalFR = priceFR * litresNeeded;
+      const totalAD = priceAD * litresNeeded;
       const economieBrute = totalFR - totalAD;
 
-      resultsContent.innerHTML = `
-        <div class="result-card">
-          <strong>Prix estimé en France :</strong> ${priceFR.toFixed(3)} €/L (${totalFR.toFixed(2)} € le plein)
-        </div>
-        <div class="result-card">
-          <strong>Prix en Andorre (${resAD.station}) :</strong> ${priceAD.toFixed(3)} €/L (${totalAD.toFixed(2)} € le plein)
-        </div>
-        <div class="result-card" style="border-left-color: #16a34a;">
-          <strong>Économie brute sur le plein :</strong> ${economieBrute.toFixed(2)} €
+      document.getElementById('cardFR').innerHTML = `
+        <strong>📍 Prix moyen en France :</strong><br>
+        <span>${priceFR.toFixed(3)} €/L — Total plein : <strong>${totalFR.toFixed(2)} €</strong> (${litresNeeded.toFixed(1)} L)</span>
+      `;
+
+      document.getElementById('cardBorder').innerHTML = `
+        <strong>🇦🇩 Prix en Andorre (${resAD.station || 'Pas de la Case'}) :</strong><br>
+        <span>${priceAD.toFixed(3)} €/L — Total plein : <strong>${totalAD.toFixed(2)} €</strong></span>
+      `;
+
+      document.getElementById('cardSavings').innerHTML = `
+        <div style="font-size: 1.1rem; font-weight: 900;">
+          💡 Économie estimée sur le plein : ${economieBrute.toFixed(2)} €
         </div>
       `;
 
-      resultsDiv.style.display = 'block';
+      stopLoader();
+      document.getElementById('results').style.display = 'block';
 
     } catch (err) {
-      errorDiv.innerText = err.message || 'Une erreur est survenue lors du calcul.';
-      errorDiv.style.display = 'block';
-    } finally {
-      document.getElementById('calcBtn').innerText = 'Voir si ça vaut le coup';
+      stopLoader();
+      errorBox.innerText = err.message || 'Une erreur est survenue lors du calcul.';
+      errorBox.style.display = 'block';
     }
   }
 </script>
