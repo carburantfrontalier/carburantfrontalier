@@ -1,44 +1,211 @@
-// api/prix-ad.js
-export default async function handler(req, res) {
-  const { carburant } = req.query;
-
-  try {
-    // Utilisation d'un proxy CORS pour récupérer le HTML de la source réelle
-    const targetUrl = 'https://www.carburani.com/';
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-
-    const response = await fetch(proxyUrl);
-    if (!response.ok) throw new Error('Impossible de contacter le proxy');
-
-    const data = await response.json();
-    const html = data.contents;
-
-    if (!html) throw new Error('Contenu vide reçu');
-
-    // Patterns de recherche dans le contenu HTML réel
-    const patterns = {
-      gazole: /Gazole[^0-9]*([0-9]+[.,][0-9]{2,3})/i,
-      sp95: /SP95[^0-9]*([0-9]+[.,][0-9]{2,3})/i,
-      sp98: /SP98[^0-9]*([0-9]+[.,][0-9]{2,3})/i,
-      e10: /SP95[^0-9]*([0-9]+[.,][0-9]{2,3})/i
-    };
-
-    const targetPattern = patterns[carburant] || patterns['gazole'];
-    const match = html.match(targetPattern);
-
-    if (!match || !match[1]) {
-      throw new Error('Format du prix introuvable dans la page');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carburant Frontalier - Calculez votre rentabilité</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
     }
 
-    const prixClean = parseFloat(match[1].replace(',', '.'));
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-    return res.status(200).json({
-      ok: true,
-      cheapest: prixClean,
-      station: 'Pas de la Case (Andorre)'
-    });
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+    }
 
-  } catch (error) {
-    return res.status(500).json({ ok: false, error: error.message });
+    h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    #results {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      display: none;
+    }
+
+    .result-card {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .error {
+      background-color: #fef2f2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Calculateur Carburant Frontalier</h1>
+
+  <div class="form-group">
+    <label for="address">Adresse de départ (France)</label>
+    <input type="text" id="address" placeholder="Ex: Perpignan, Toulouse, Lille...">
+  </div>
+
+  <div class="form-group">
+    <label for="carburant">Type de carburant</label>
+    <select id="carburant">
+      <option value="gazole">Gazole / Diesel</option>
+      <option value="sp95">Sans Plomb 95 (SP95)</option>
+      <option value="e10">Sans Plomb 95-E10</option>
+      <option value="sp98">Sans Plomb 98 (SP98)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="tank">Taille du réservoir (Litres)</label>
+    <input type="number" id="tank" value="50" min="10" max="150">
+  </div>
+
+  <div class="form-group">
+    <label for="consumption">Consommation (L/100km)</label>
+    <input type="number" id="consumption" value="6.0" step="0.1" min="1">
+  </div>
+
+  <button id="calcBtn" onclick="calculate()">Voir si ça vaut le coup</button>
+
+  <div id="error" class="error"></div>
+
+  <div id="results">
+    <h3>Résultats du calcul</h3>
+    <div id="resultsContent"></div>
+  </div>
+</div>
+
+<script>
+  async function calculate() {
+    const address = document.getElementById('address').value;
+    const carburant = document.getElementById('carburant').value;
+    const tank = parseFloat(document.getElementById('tank').value);
+    const consumption = parseFloat(document.getElementById('consumption').value);
+
+    const errorDiv = document.getElementById('error');
+    const resultsDiv = document.getElementById('results');
+    const resultsContent = document.getElementById('resultsContent');
+
+    errorDiv.style.display = 'none';
+    resultsDiv.style.display = 'none';
+
+    if (!address) {
+      errorDiv.innerText = 'Veuillez saisir une adresse de départ.';
+      errorDiv.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('calcBtn').innerText = 'Calcul en cours...';
+
+    try {
+      // 1. Récupérer les prix côtés France & Andorre/Espagne/etc.
+      const [resFR, resAD] = await Promise.all([
+        fetch(`/api/prix-fr?carburant=${carburant}&address=${encodeURIComponent(address)}`).then(r => r.json()),
+        fetch(`/api/prix-ad?carburant=${carburant}`).then(r => r.json())
+      ]);
+
+      if (!resAD.ok) {
+        throw new Error(resAD.error || 'Erreur lors de la récupération des prix en Andorre.');
+      }
+
+      const priceFR = resFR.cheapest || 1.80; // Valeur par défaut si non trouvée
+      const priceAD = resAD.cheapest;
+
+      const totalFR = priceFR * tank;
+      const totalAD = priceAD * tank;
+      const economieBrute = totalFR - totalAD;
+
+      resultsContent.innerHTML = `
+        <div class="result-card">
+          <strong>Prix estimé en France :</strong> ${priceFR.toFixed(3)} €/L (${totalFR.toFixed(2)} € le plein)
+        </div>
+        <div class="result-card">
+          <strong>Prix en Andorre (${resAD.station}) :</strong> ${priceAD.toFixed(3)} €/L (${totalAD.toFixed(2)} € le plein)
+        </div>
+        <div class="result-card" style="border-left-color: #16a34a;">
+          <strong>Économie brute sur le plein :</strong> ${economieBrute.toFixed(2)} €
+        </div>
+      `;
+
+      resultsDiv.style.display = 'block';
+
+    } catch (err) {
+      errorDiv.innerText = err.message || 'Une erreur est survenue lors du calcul.';
+      errorDiv.style.display = 'block';
+    } finally {
+      document.getElementById('calcBtn').innerText = 'Voir si ça vaut le coup';
+    }
   }
-}
+</script>
+
+</body>
+</html>
