@@ -71,7 +71,6 @@
   .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
   .field{margin-bottom:16px; position:relative;}
 
-  /* autocomplétion adresse */
   .addr-row{display:flex; gap:8px;}
   .addr-row input{flex:1;}
   .geoloc-btn{
@@ -86,7 +85,6 @@
   .suggestions div{padding:8px 12px; font-size:13px; cursor:pointer;}
   .suggestions div:hover{background:var(--ecru);}
 
-  /* jauge */
   .gauge-wrap{margin-bottom:16px;}
   .gauge-value{font-size:20px; font-weight:600; margin-bottom:10px; font-family:'Space Grotesk',sans-serif;}
   .gauge-track{position:relative; height:6px; border-radius:3px; background:var(--border); margin:0 4px 6px;}
@@ -162,7 +160,6 @@
 
 <main>
 
-  <!-- Formulaire calcul -->
   <div class="card">
 
     <div class="field">
@@ -213,7 +210,6 @@
     <p class="status-msg" id="calc-status"></p>
   </div>
 
-  <!-- Résultat -->
   <div class="card hidden" id="result-card">
     <div class="result" id="result-box">
       <div class="result-title" id="result-title"></div>
@@ -243,15 +239,19 @@
 
 <script>
   const FRONTIERES = [
-    { pays: 'Espagne', lieu: 'La Jonquera', lat: 42.4189, lon: 2.8747, live: true, source: 'es', zoneAPI: 'Jonquera' },
-    { pays: 'Italie',  lieu: 'Vintimille',   lat: 43.8497, lon: 7.5486, live: true, source: 'it', zoneAPI: 'Ventimiglia' },
-    { pays: 'Belgique',   lieu: 'Rekkem',    lat: 50.7500, lon: 3.2300, live: false },
-    { pays: 'Luxembourg', lieu: 'Zoufftgen', lat: 49.4700, lon: 6.1200, live: false }
+    { pays: 'Andorre',   lieu: 'Pas de la Case', lat: 42.5425, lon: 1.7336, live: true, source: 'ad' },
+    { pays: 'Espagne',   lieu: 'La Jonquera',    lat: 42.4189, lon: 2.8747, live: true, source: 'es', zoneAPI: 'Jonquera' },
+    { pays: 'Italie',    lieu: 'Vintimille',     lat: 43.8497, lon: 7.5486, live: true, source: 'it', zoneAPI: 'Ventimiglia' },
+    { pays: 'Allemagne', lieu: 'Kehl',           lat: 48.5711, lon: 7.8089, live: true, source: 'de' },
+    { pays: 'Belgique',  lieu: 'Rekkem',         lat: 50.7500, lon: 3.2300, live: false },
+    { pays: 'Luxembourg',lieu: 'Zoufftgen',      lat: 49.4700, lon: 6.1200, live: false }
   ];
 
   const bonsPlans = {
+    'Andorre': 'Bon à savoir : alcool -40 à -60%, tabac -50 à -70%, parfums & cosmétiques -20 à -40% en Andorre (attention aux franchises douanières !).',
     'Espagne': 'Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.',
-    'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie.'
+    'Italie': 'Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie.',
+    'Allemagne': 'Bon à savoir : hygiène & cosmétiques (dm, Rossmann) -30 à -50%, produits ménagers -20% en Allemagne.'
   };
 
   let position = null;
@@ -386,24 +386,26 @@
       }
 
       setStatus('Récupération des prix côté frontière...');
-      const carburantFrontiere = carburant === 'e10' ? 'sp95' : carburant;
-      const endpointFrontiere = plusProche.source === 'it'
-        ? `/api/prix-it?comune=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburantFrontiere}`
-        : `/api/prix-es?municipio=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburantFrontiere}`;
+      let endpointFrontiere = '';
+      if (plusProche.source === 'it') {
+        endpointFrontiere = `/api/prix-it?comune=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburant === 'e10' ? 'sp95' : carburant}`;
+      } else if (plusProche.source === 'es') {
+        endpointFrontiere = `/api/prix-es?municipio=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburant === 'e10' ? 'sp95' : carburant}`;
+      } else if (plusProche.source === 'de') {
+        endpointFrontiere = `/api/prix-de?lat=${plusProche.lat}&lon=${plusProche.lon}&carburant=${carburant}`;
+      } else if (plusProche.source === 'ad') {
+        endpointFrontiere = `/api/prix-ad?carburant=${carburant}`;
+      }
+
       const rFront = await fetch(endpointFrontiere);
       const dataFront = await rFront.json();
-      const carburantsDisponiblesFrontiere = plusProche.source === 'it'
-        ? ['gazole', 'sp95', 'e10', 'gplc']
-        : ['gazole', 'sp95', 'e10'];
-      if (!dataFront.ok || !carburantsDisponiblesFrontiere.includes(carburant)){
+
+      if (!dataFront.ok){
         resultCard.classList.remove('hidden');
         box.className = 'result warn';
         title.className = 'result-title warn';
         title.textContent = '⚠ Donnée indisponible';
-        amount.textContent = '';
-        detail.textContent = !carburantsDisponiblesFrontiere.includes(carburant)
-          ? "Ce carburant n'est pas suivi par la source officielle de ce pays pour l'instant."
-          : `Impossible de récupérer les prix côté ${plusProche.pays} en ce moment (source officielle indisponible). Réessayez dans quelques minutes.`;
+        amount.textContent = `Impossible de récupérer les prix côté ${plusProche.pays} en ce moment (source officielle indisponible). Réessayez dans quelques minutes.`;
         setStatus('');
         btn.disabled = false;
         return;
@@ -455,7 +457,7 @@
         }
       }
       amount.textContent = (net >= 0 ? '+' : '') + net.toFixed(2) + ' €';
-      detail.textContent = `Sur ${litresManquants.toFixed(1)} L, trajet réel de ${kmAR.toFixed(0)} km A/R (${plusProche.lieu}, ${plusProche.pays}) et péage estimé de ${peageEstime.toFixed(2)} € déduits. Prix France : ${prixLocal.toFixed(3)} €/L (moyenne de ${dataFr.stationsCount} stations à moins de 20 km). Prix frontière : ${prixEtranger.toFixed(3)} €/L (station la moins chère à ${plusProche.lieu}).`;
+      detail.textContent = `Sur ${litresManquants.toFixed(1)} L, trajet réel de ${kmAR.toFixed(0)} km A/R (${plusProche.lieu}, ${plusProche.pays}) et péage estimé de ${peageEstime.toFixed(2)} € déduits. Prix France : ${prixLocal.toFixed(3)} €/L (moyenne de ${dataFr.stationsCount} stations à moins de 20 km). Prix frontière : ${prixEtranger.toFixed(3)} €/L (${plusProche.lieu}).`;
 
       if (dataFr.top3 && dataFr.top3.length > 0){
         top3List.innerHTML = '';
