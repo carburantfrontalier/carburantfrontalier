@@ -3,57 +3,58 @@ export default async function handler(req, res) {
   const { carburant } = req.query;
 
   try {
-    // 1. Tentative de scraping sur la source principale
-    const response = await fetch('https://www.carburandorre.com/', {
+    // Interrogation d'une API de flux direct (format JSON)
+    const response = await fetch('https://prix-carburants-frontieres.com/api/andorra.json', {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8'
+        'Accept': 'application/json',
+        'User-Agent': 'CarburantFrontalier/1.0'
       }
     });
 
-    if (response.ok) {
-      const html = await response.text();
-
-      const patterns = {
-        gazole: /(?:gazole|diesel)[^0-9]*([1-2][.,][0-9]{2,3})/i,
-        sp95: /(?:sp95|sans plomb 95)[^0-9]*([1-2][.,][0-9]{2,3})/i,
-        sp98: /(?:sp98|sans plomb 98)[^0-9]*([1-2][.,][0-9]{2,3})/i,
-        e10: /(?:sp95|e10)[^0-9]*([1-2][.,][0-9]{2,3})/i
-      };
-
-      const pattern = patterns[carburant] || patterns['gazole'];
-      const match = html.match(pattern);
-
-      if (match && match[1]) {
-        const prixScrape = parseFloat(match[1].replace(',', '.'));
-        if (prixScrape > 0.8 && prixScrape < 2.5) {
-          return res.status(200).json({
-            ok: true,
-            cheapest: prixScrape,
-            station: 'Pas de la Case (Andorre)'
-          });
-        }
-      }
+    if (!response.ok) {
+      throw new Error(`Erreur réseau (${response.status})`);
     }
 
-    // 2. Fallback de secours sur une API miroir si le scraping échoue
-    const fallbackResponse = await fetch('https://api.carburants-andorre.fr/latest');
-    if (fallbackResponse.ok) {
-      const data = await fallbackResponse.json();
-      const fuelKey = carburant === 'e10' ? 'sp95' : carburant;
-      if (data && data[fuelKey]) {
+    const data = await response.json();
+    const fuelKey = carburant === 'e10' ? 'sp95' : carburant;
+    const prix = data[fuelKey] || data['gazole'];
+
+    if (!prix || isNaN(prix)) {
+      throw new Error('Format de prix invalide');
+    }
+
+    return res.status(200).json({
+      ok: true,
+      cheapest: parseFloat(prix),
+      station: 'Pas de la Case (Andorre)'
+    });
+
+  } catch (error) {
+    // Si l'API JSON échoue, tentative via un proxy CORS
+    try {
+      const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.prix-carburant.com/andorre/');
+      const proxyRes = await fetch(proxyUrl);
+      const proxyData = await proxyRes.json();
+      
+      const patterns = {
+        gazole: /Gazole[^0-9]*([1-2][.,][0-9]{2,3})/i,
+        sp95: /SP95[^0-9]*([1-2][.,][0-9]{2,3})/i,
+        sp98: /SP98[^0-9]*([1-2][.,][0-9]{2,3})/i,
+        e10: /SP95[^0-9]*([1-2][.,][0-9]{2,3})/i
+      };
+
+      const match = proxyData.contents.match(patterns[carburant] || patterns['gazole']);
+      if (match && match[1]) {
         return res.status(200).json({
           ok: true,
-          cheapest: parseFloat(data[fuelKey]),
+          cheapest: parseFloat(match[1].replace(',', '.')),
           station: 'Pas de la Case (Andorre)'
         });
       }
+    } catch (e) {
+      // Ignorer et laisser l'erreur principale
     }
 
-    throw new Error('Aucune source n\'a pu fournir les prix');
-
-  } catch (error) {
-    // En cas d'échec total des requêtes réseau
     return res.status(500).json({ ok: false, error: error.message });
   }
 }
