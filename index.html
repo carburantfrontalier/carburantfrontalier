@@ -12,22 +12,17 @@
       --card-bg: #FFFFFF;
       --border-color: #000000;
       --text-muted: #555555;
-      
       --green-bg: #d4edda;
       --green-border: #28a745;
       --green-text: #155724;
-
       --red-bg: #f8d7da;
       --red-border: #dc3545;
       --red-text: #721c24;
+      --warn-bg: #FFF3CD;
+      --warn-border: #FFC107;
+      --warn-text: #664D03;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg-ecru);
@@ -38,7 +33,6 @@
       align-items: flex-start;
       min-height: 100vh;
     }
-
     .app-container {
       width: 100%;
       max-width: 520px;
@@ -50,7 +44,6 @@
       box-shadow: 8px 8px 0px var(--black);
       margin: 10px auto;
     }
-
     h1 {
       font-size: 1.7rem;
       font-weight: 900;
@@ -59,7 +52,6 @@
       text-transform: uppercase;
       letter-spacing: -0.5px;
     }
-
     .hero-subtitle {
       text-align: center;
       font-size: 0.95rem;
@@ -68,8 +60,6 @@
       margin-bottom: 14px;
       line-height: 1.35;
     }
-
-    /* Badges des pays frontaliers */
     .countries-badge-list {
       display: flex;
       flex-wrap: wrap;
@@ -77,7 +67,6 @@
       gap: 6px;
       margin-bottom: 16px;
     }
-
     .country-tag {
       background: var(--bg-ecru);
       border: 1.5px solid var(--black);
@@ -86,8 +75,7 @@
       font-size: 0.78rem;
       font-weight: 800;
     }
-
-    /* En-tête valeur ajoutée / produits */
+    .country-tag.soon { opacity: 0.5; }
     .value-banner {
       background: #FFFDF0;
       border: 2px dashed var(--black);
@@ -99,31 +87,10 @@
       line-height: 1.35;
       text-align: center;
     }
-
-    .value-banner strong {
-      color: #000;
-    }
-
-    .form-group {
-      margin-bottom: 18px;
-      position: relative;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      font-size: 0.95rem;
-      margin-bottom: 6px;
-    }
-
-    .input-geoloc-wrapper {
-      display: flex;
-      gap: 8px;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    select {
+    .form-group { margin-bottom: 18px; position: relative; }
+    label { display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+    .input-geoloc-wrapper { display: flex; gap: 8px; }
+    input[type="text"], input[type="number"], select {
       width: 100%;
       padding: 12px 14px;
       font-size: 1rem;
@@ -133,11 +100,7 @@
       background: #FFF;
       outline: none;
     }
-
-    input:focus, select:focus {
-      background-color: #FFFDF0;
-    }
-
+    input:focus, select:focus { background-color: #FFFDF0; }
     .btn-geoloc {
       background: var(--yellow);
       border: 2px solid var(--black);
@@ -150,12 +113,7 @@
       justify-content: center;
       transition: transform 0.1s;
     }
-
-    .btn-geoloc:active {
-      transform: scale(0.95);
-    }
-
-    /* Autocomplétion d'adresse */
+    .btn-geoloc:active { transform: scale(0.95); }
     .autocomplete-results {
       position: absolute;
       top: 100%;
@@ -171,20 +129,8 @@
       box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
       display: none;
     }
-
-    .autocomplete-item {
-      padding: 10px 12px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      border-bottom: 1px solid #EEE;
-    }
-
-    .autocomplete-item:hover {
-      background-color: var(--yellow);
-      font-weight: 700;
-    }
-
-    /* Gauge de réservoir interactive */
+    .autocomplete-item { padding: 10px 12px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #EEE; }
+    .autocomplete-item:hover { background-color: var(--yellow); font-weight: 700; }
     .gauge-container {
       margin-top: 10px;
       background: #F8F6F0;
@@ -192,31 +138,9 @@
       border: 2px solid var(--black);
       border-radius: 10px;
     }
-
-    .gauge-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-weight: 800;
-    }
-
-    .gauge-slider {
-      width: 100%;
-      accent-color: var(--black);
-      cursor: pointer;
-    }
-
-    .gauge-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-top: 6px;
-      color: var(--text-muted);
-    }
-
-    /* Bouton principal */
+    .gauge-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 800; }
+    .gauge-slider { width: 100%; accent-color: var(--black); cursor: pointer; }
+    .gauge-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; margin-top: 6px; color: var(--text-muted); }
     .btn-submit {
       width: 100%;
       padding: 16px;
@@ -232,13 +156,8 @@
       transition: transform 0.1s, box-shadow 0.1s;
       margin-top: 10px;
     }
-
-    .btn-submit:active {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0px var(--yellow);
-    }
-
-    /* Loader Ludique */
+    .btn-submit:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--yellow); }
+    .btn-submit:disabled { opacity: 0.5; cursor: default; }
     .loader-container {
       display: none;
       text-align: center;
@@ -249,55 +168,13 @@
       margin-top: 20px;
       box-shadow: 4px 4px 0px var(--black);
     }
-
-    .pump-anim {
-      font-size: 2.5rem;
-      animation: pumpBounce 0.8s infinite alternate ease-in-out;
-      margin-bottom: 8px;
-    }
-
-    @keyframes pumpBounce {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-8px); }
-    }
-
-    .loading-text {
-      font-weight: 900;
-      font-size: 1.05rem;
-      color: var(--black);
-      margin-bottom: 6px;
-    }
-
-    .loading-subtext {
-      font-size: 0.88rem;
-      color: #333;
-      font-style: italic;
-      margin-bottom: 12px;
-      line-height: 1.3;
-    }
-
-    .progress-bar-bg {
-      width: 100%;
-      height: 12px;
-      background: #E5E7EB;
-      border: 2px solid var(--black);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--yellow);
-      transition: width 0.2s linear;
-    }
-
-    /* Cartes de résultats */
-    #results {
-      display: none;
-      margin-top: 24px;
-    }
-
+    .pump-anim { font-size: 2.5rem; animation: pumpBounce 0.8s infinite alternate ease-in-out; margin-bottom: 8px; }
+    @keyframes pumpBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+    .loading-text { font-weight: 900; font-size: 1.05rem; color: var(--black); margin-bottom: 6px; }
+    .loading-subtext { font-size: 0.88rem; color: #333; font-style: italic; margin-bottom: 12px; line-height: 1.3; }
+    .progress-bar-bg { width: 100%; height: 12px; background: #E5E7EB; border: 2px solid var(--black); border-radius: 6px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: var(--yellow); transition: width 0.2s linear; }
+    #results { display: none; margin-top: 24px; }
     .result-card {
       background: #FFF;
       border: 2px solid var(--black);
@@ -306,37 +183,11 @@
       margin-bottom: 12px;
       box-shadow: 3px 3px 0px var(--black);
     }
-
-    /* Bloc de rentabilité dynamique (Vert ou Rouge) */
-    .result-card.profitability-status {
-      font-size: 1.05rem;
-      font-weight: 800;
-      line-height: 1.4;
-      transition: background-color 0.3s, border-color 0.3s;
-    }
-
-    .result-card.profitability-status.status-profitable {
-      background-color: var(--green-bg);
-      border: 3px solid var(--green-border);
-      color: var(--green-text);
-    }
-
-    .result-card.profitability-status.status-unprofitable {
-      background-color: var(--red-bg);
-      border: 3px solid var(--red-border);
-      color: var(--red-text);
-    }
-
-    .profitability-title {
-      font-size: 1.2rem;
-      font-weight: 900;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Section Comparatif des stations en France */
+    .result-card.profitability-status { font-size: 1.05rem; font-weight: 800; line-height: 1.4; }
+    .result-card.profitability-status.status-profitable { background-color: var(--green-bg); border: 3px solid var(--green-border); color: var(--green-text); }
+    .result-card.profitability-status.status-unprofitable { background-color: var(--red-bg); border: 3px solid var(--red-border); color: var(--red-text); }
+    .result-card.profitability-status.status-warning { background-color: var(--warn-bg); border: 3px solid var(--warn-border); color: var(--warn-text); }
+    .profitability-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .fr-stations-section {
       margin-top: 20px;
       background: #FFF;
@@ -345,7 +196,6 @@
       padding: 16px;
       box-shadow: 4px 4px 0px var(--black);
     }
-
     .fr-stations-title {
       font-size: 1rem;
       font-weight: 900;
@@ -357,69 +207,20 @@
       align-items: center;
       gap: 6px;
     }
-
-    .station-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #EEE;
-    }
-
-    .station-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .station-info {
-      flex: 1;
-      padding-right: 10px;
-    }
-
-    .station-name {
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: var(--black);
-    }
-
-    .station-address {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .station-price-tag {
-      text-align: right;
-    }
-
+    .station-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #EEE; }
+    .station-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .station-info { flex: 1; padding-right: 10px; }
+    .station-name { font-weight: 800; font-size: 0.9rem; color: var(--black); }
+    .station-address { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .station-price-tag { text-align: right; }
     .price-value {
-      font-size: 1.1rem;
-      font-weight: 900;
-      color: var(--black);
-      background: var(--yellow);
-      padding: 4px 8px;
-      border: 1.5px solid var(--black);
-      border-radius: 6px;
-      display: inline-block;
+      font-size: 1.1rem; font-weight: 900; color: var(--black); background: var(--yellow);
+      padding: 4px 8px; border: 1.5px solid var(--black); border-radius: 6px; display: inline-block;
     }
-
-    .distance-value {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #666;
-      margin-top: 3px;
-    }
-
+    .distance-value { font-size: 0.75rem; font-weight: 700; color: #666; margin-top: 3px; }
     .error-box {
-      display: none;
-      background: #FEE2E2;
-      border: 2px solid var(--black);
-      color: #991B1B;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 16px;
-      font-weight: 700;
-      font-size: 0.9rem;
+      display: none; background: #FEE2E2; border: 2px solid var(--black); color: #991B1B;
+      padding: 12px; border-radius: 8px; margin-top: 16px; font-weight: 700; font-size: 0.9rem;
     }
   </style>
 </head>
@@ -427,38 +228,31 @@
 
 <div class="app-container">
   <h1>⛽ Carburant Frontalier</h1>
-  
+
   <p class="hero-subtitle">
-    Calculez instantanément si un déplacement de l'autre côté de la frontière est rentable pour votre plein.
+    Calculez instantanément si un déplacement à la frontière la plus proche est rentable pour votre plein.
   </p>
 
-  <!-- Tags des pays frontaliers concernés -->
   <div class="countries-badge-list">
-    <span class="country-tag">🇦🇩 Andorre</span>
     <span class="country-tag">🇪🇸 Espagne</span>
     <span class="country-tag">🇮🇹 Italie</span>
-    <span class="country-tag">🇩🇪 Allemagne</span>
-    <span class="country-tag">🇧🇪 Belgique</span>
-    <span class="country-tag">🇱🇺 Luxembourg</span>
-    <span class="country-tag">🇨🇭 Suisse</span>
+    <span class="country-tag soon">🇧🇪 Belgique (bientôt)</span>
+    <span class="country-tag soon">🇱🇺 Luxembourg (bientôt)</span>
   </div>
 
-  <!-- Bannière promesse d'économies annexes -->
   <div class="value-banner">
-    🛒 <strong>Bon à savoir :</strong> Dans ces zones frontalières, les courses alimentaires, le tabac et les cosmétiques sont souvent <strong>20% à 40% moins chers</strong> qu'en France.
+    🛒 <strong>Bon à savoir :</strong> selon la frontière, l'alimentation, le tabac ou les cosmétiques peuvent aussi être nettement moins chers qu'en France.
   </div>
 
-  <!-- Adresse + Géolocalisation -->
   <div class="form-group">
     <label for="address">Adresse ou ville de départ (France)</label>
     <div class="input-geoloc-wrapper">
-      <input type="text" id="address" placeholder="Ex: Perpignan, Ax-les-Thermes, Lille..." autocomplete="off">
+      <input type="text" id="address" placeholder="Ex: Perpignan, Nice, Lille..." autocomplete="off">
       <button type="button" class="btn-geoloc" onclick="geolocateUser()" title="Utiliser ma position actuelle">📍</button>
     </div>
     <div id="autocompleteResults" class="autocomplete-results"></div>
   </div>
 
-  <!-- Carburant -->
   <div class="form-group">
     <label for="carburant">Type de carburant</label>
     <select id="carburant">
@@ -466,10 +260,10 @@
       <option value="sp95">Sans Plomb 95 (SP95)</option>
       <option value="e10">Sans Plomb 95-E10</option>
       <option value="sp98">Sans Plomb 98 (SP98)</option>
+      <option value="gplc">GPL</option>
     </select>
   </div>
 
-  <!-- Réservoir & Consommation -->
   <div class="form-group" style="display: flex; gap: 12px;">
     <div style="flex: 1;">
       <label for="tank">Capacité (L)</label>
@@ -481,7 +275,6 @@
     </div>
   </div>
 
-  <!-- Jauge du réservoir -->
   <div class="form-group">
     <div class="gauge-container">
       <div class="gauge-header">
@@ -490,79 +283,63 @@
       </div>
       <input type="range" id="gaugeSlider" class="gauge-slider" min="0" max="1" step="0.125" value="0.25">
       <div class="gauge-labels">
-        <span>Vide</span>
-        <span>1/8</span>
-        <span>1/4</span>
-        <span>3/8</span>
-        <span>1/2</span>
-        <span>5/8</span>
-        <span>3/4</span>
-        <span>7/8</span>
-        <span>Plein</span>
+        <span>Vide</span><span>1/8</span><span>1/4</span><span>3/8</span><span>1/2</span><span>5/8</span><span>3/4</span><span>7/8</span><span>Plein</span>
       </div>
     </div>
   </div>
 
-  <!-- Bouton de calcul -->
   <button class="btn-submit" id="calcBtn" onclick="calculate()">Calculer la rentabilité</button>
 
-  <!-- Loader Ludique -->
   <div id="loader" class="loader-container">
     <div class="pump-anim">⛽</div>
-    <div class="loading-text">Calcul de votre rentabilité en cours...</div>
-    <div class="loading-subtext">💡 Rappel : ces pays proposent aussi des prix 20% à 40% moins chers sur l'alimentation et le tabac.</div>
-    <div class="progress-bar-bg">
-      <div id="progressBar" class="progress-bar-fill"></div>
-    </div>
+    <div class="loading-text" id="loadingText">Recherche de la frontière la plus proche...</div>
+    <div class="loading-subtext">💡 Le calcul prend en compte le trajet réel, pas seulement le prix à la pompe.</div>
+    <div class="progress-bar-bg"><div id="progressBar" class="progress-bar-fill"></div></div>
   </div>
 
-  <!-- Zone d'erreur -->
   <div id="errorBox" class="error-box"></div>
 
-  <!-- Résultats -->
   <div id="results">
-    <!-- Résumé Prix France vs Frontière -->
     <div class="result-card" id="cardFR"></div>
     <div class="result-card" id="cardBorder"></div>
-
-    <!-- BLOC RENTABILITÉ (Vert si gain / Rouge si perte) -->
     <div class="result-card profitability-status" id="cardProfitability"></div>
-
-    <!-- COMPARATIF DES STATIONS EN FRANCE (S'affiche APRÈS le résultat) -->
-    <div class="fr-stations-section" id="frStationsSection">
+    <div class="fr-stations-section" id="frStationsSection" style="display:none;">
       <div class="fr-stations-title">🇫🇷 Stations les moins chères à proximité</div>
-      <div id="frStationsList">
-        <!-- Généré dynamiquement en JS -->
-      </div>
+      <div id="frStationsList"></div>
+    </div>
+    <div class="fr-stations-section" id="borderStationsSection" style="display:none;">
+      <div class="fr-stations-title" id="borderStationsTitle">Stations les moins chères à la frontière</div>
+      <div id="borderStationsList"></div>
     </div>
   </div>
 </div>
 
 <script>
-  // --- Géolocalisation utilisateur ---
+  const FRONTIERES = [
+    { pays: 'Espagne', lieu: 'La Jonquera', lat: 42.4189, lon: 2.8747, live: true, source: 'es', zoneAPI: 'Jonquera' },
+    { pays: 'Italie',  lieu: 'Vintimille',   lat: 43.8497, lon: 7.5486, live: true, source: 'it', zoneAPI: 'Ventimiglia' },
+    { pays: 'Belgique',   lieu: 'Rekkem',    lat: 50.7500, lon: 3.2300, live: false },
+    { pays: 'Luxembourg', lieu: 'Zoufftgen', lat: 49.4700, lon: 6.1200, live: false }
+  ];
+
+  const bonsPlans = {
+    'Espagne': "Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.",
+    'Italie': "Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie."
+  };
+
+  let selectedPosition = null;
+
   function geolocateUser() {
     const addressInput = document.getElementById('address');
     if (!navigator.geolocation) {
       alert("La géolocalisation n'est pas supportée par votre navigateur.");
       return;
     }
-
     addressInput.value = "Recherche de votre position...";
-    
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${longitude}&lat=${latitude}`);
-          const data = await res.json();
-          if (data.features && data.features.length > 0) {
-            addressInput.value = data.features[0].properties.label;
-          } else {
-            addressInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-          }
-        } catch (e) {
-          addressInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        }
+      (pos) => {
+        selectedPosition = { lat: pos.coords.latitude, lon: pos.coords.longitude, label: 'Ma position actuelle' };
+        addressInput.value = 'Ma position actuelle';
       },
       () => {
         alert("Impossible d'accéder à votre géolocalisation.");
@@ -571,21 +348,16 @@
     );
   }
 
-  // --- Autocomplétion adresse.data.gouv.fr ---
   const addressInput = document.getElementById('address');
   const autocompleteResults = document.getElementById('autocompleteResults');
 
   addressInput.addEventListener('input', async () => {
+    selectedPosition = null;
     const query = addressInput.value.trim();
-    if (query.length < 3) {
-      autocompleteResults.style.display = 'none';
-      return;
-    }
-
+    if (query.length < 3) { autocompleteResults.style.display = 'none'; return; }
     try {
       const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
       const data = await res.json();
-      
       autocompleteResults.innerHTML = '';
       if (data.features && data.features.length > 0) {
         data.features.forEach(feature => {
@@ -595,6 +367,7 @@
           item.innerText = label;
           item.onclick = () => {
             addressInput.value = label;
+            selectedPosition = { lat: feature.geometry.coordinates[1], lon: feature.geometry.coordinates[0], label };
             autocompleteResults.style.display = 'none';
           };
           autocompleteResults.appendChild(item);
@@ -603,44 +376,26 @@
       } else {
         autocompleteResults.style.display = 'none';
       }
-    } catch (e) {
-      autocompleteResults.style.display = 'none';
-    }
+    } catch (e) { autocompleteResults.style.display = 'none'; }
   });
-
   document.addEventListener('click', (e) => {
     if (e.target !== addressInput) autocompleteResults.style.display = 'none';
   });
 
-  // --- Jauge de réservoir (découpage par 1/8ème) ---
   const gaugeSlider = document.getElementById('gaugeSlider');
   const gaugeValue = document.getElementById('gaugeValue');
-  const gaugeLabels = {
-    '0': 'Vide',
-    '0.125': '1/8',
-    '0.25': '1/4',
-    '0.375': '3/8',
-    '0.5': '1/2',
-    '0.625': '5/8',
-    '0.75': '3/4',
-    '0.875': '7/8',
-    '1': 'Plein'
-  };
+  const gaugeLabels = { '0':'Vide','0.125':'1/8','0.25':'1/4','0.375':'3/8','0.5':'1/2','0.625':'5/8','0.75':'3/4','0.875':'7/8','1':'Plein' };
+  gaugeSlider.addEventListener('input', () => { gaugeValue.innerText = gaugeLabels[gaugeSlider.value] || '1/4'; });
 
-  gaugeSlider.addEventListener('input', () => {
-    gaugeValue.innerText = gaugeLabels[gaugeSlider.value] || '1/4';
-  });
-
-  // --- Animation Loader ---
   let loadingInterval;
   function startLoader() {
     document.getElementById('loader').style.display = 'block';
     document.getElementById('results').style.display = 'none';
     document.getElementById('errorBox').style.display = 'none';
-    
+    document.getElementById('frStationsSection').style.display = 'none';
+    document.getElementById('borderStationsSection').style.display = 'none';
     const progressBar = document.getElementById('progressBar');
     progressBar.style.width = '0%';
-    
     let progress = 0;
     loadingInterval = setInterval(() => {
       progress += (100 / 250);
@@ -648,106 +403,188 @@
       progressBar.style.width = `${progress}%`;
     }, 100);
   }
-
   function stopLoader() {
     clearInterval(loadingInterval);
     const progressBar = document.getElementById('progressBar');
     if (progressBar) progressBar.style.width = '100%';
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-    }, 200);
+    setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 200);
+  }
+  function setLoadingText(msg) {
+    const el = document.getElementById('loadingText');
+    if (el) el.textContent = msg;
   }
 
-  // --- Calcul de Rentabilité & Comparatif Stations ---
+  function distanceKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  async function distanceRoutiere(lat1, lon1, lat2, lon2) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
+    const r = await fetch(url);
+    const data = await r.json();
+    if (data.code !== 'Ok' || !data.routes || !data.routes[0]) throw new Error('route_failed');
+    return { km: data.routes[0].distance / 1000, minutes: data.routes[0].duration / 60 };
+  }
+
   async function calculate() {
-    const address = addressInput.value.trim();
     const carburant = document.getElementById('carburant').value;
-    const tank = parseFloat(document.getElementById('tank').value);
-    const consumption = parseFloat(document.getElementById('consumption').value);
+    const tank = parseFloat(document.getElementById('tank').value) || 0;
+    const consumption = parseFloat(document.getElementById('consumption').value) || 0;
     const currentGauge = parseFloat(gaugeSlider.value);
-
     const errorBox = document.getElementById('errorBox');
+    const calcBtn = document.getElementById('calcBtn');
 
-    if (!address) {
-      errorBox.innerText = 'Veuillez renseigner votre adresse de départ.';
+    if (!selectedPosition) {
+      errorBox.innerText = 'Choisissez une adresse dans la liste proposée, ou utilisez la géolocalisation.';
       errorBox.style.display = 'block';
       return;
     }
 
+    calcBtn.disabled = true;
     startLoader();
 
     try {
       const litresNeeded = tank * (1 - currentGauge);
 
-      const [resFR, resAD] = await Promise.all([
-        fetch(`/api/prix-fr?carburant=${carburant}&address=${encodeURIComponent(address)}`).then(r => r.json()).catch(() => ({ ok: false })),
-        fetch(`/api/prix-ad?carburant=${carburant}`).then(r => r.json()).catch(() => ({ ok: false }))
-      ]);
+      setLoadingText('Recherche de la frontière la plus proche...');
+      let plusProche = null, distMin = Infinity;
+      FRONTIERES.forEach(f => {
+        const d = distanceKm(selectedPosition.lat, selectedPosition.lon, f.lat, f.lon);
+        if (d < distMin) { distMin = d; plusProche = f; }
+      });
 
-      if (!resAD.ok) {
-        throw new Error("Impossible de récupérer les tarifs du pays frontalier. Réessayez dans quelques instants.");
+      if (!plusProche.live) {
+        stopLoader();
+        document.getElementById('cardFR').style.display = 'none';
+        document.getElementById('cardBorder').style.display = 'none';
+        const profitCard = document.getElementById('cardProfitability');
+        profitCard.className = 'result-card profitability-status status-warning';
+        profitCard.innerHTML = `
+          <div class="profitability-title">⚠ Frontière la plus proche : ${plusProche.pays}</div>
+          <div>La frontière la plus proche de chez vous (${plusProche.lieu}, ${plusProche.pays}) n'est pas encore connectée à une source de prix officielle en temps réel sur ce site.</div>
+        `;
+        document.getElementById('results').style.display = 'block';
+        calcBtn.disabled = false;
+        return;
       }
+      document.getElementById('cardFR').style.display = 'block';
+      document.getElementById('cardBorder').style.display = 'block';
 
-      const priceFR = resFR.cheapest || 1.82;
-      const priceAD = resAD.cheapest;
+      setLoadingText('Récupération des prix côté frontière...');
+      const carburantFrontiere = carburant === 'e10' ? 'sp95' : carburant;
+      const endpointFrontiere = plusProche.source === 'it'
+        ? `/api/prix-it?comune=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburantFrontiere}`
+        : `/api/prix-es?municipio=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburantFrontiere}`;
+      const dataFront = await fetch(endpointFrontiere).then(r => r.json()).catch(() => ({ ok: false }));
+
+      const carburantsDisponiblesFrontiere = plusProche.source === 'it'
+        ? ['gazole', 'sp95', 'e10', 'gplc']
+        : ['gazole', 'sp95', 'e10'];
+
+      if (!dataFront.ok || !carburantsDisponiblesFrontiere.includes(carburant)) {
+        throw new Error(
+          !carburantsDisponiblesFrontiere.includes(carburant)
+            ? "Ce carburant n'est pas suivi par la source officielle de ce pays pour l'instant."
+            : `Impossible de récupérer les prix côté ${plusProche.pays} en ce moment (source officielle indisponible). Réessayez dans quelques minutes.`
+        );
+      }
+      const priceBorder = dataFront.cheapest;
+
+      setLoadingText('Récupération des prix en France...');
+      const dataFr = await fetch(`/api/prix-fr?lat=${selectedPosition.lat}&lon=${selectedPosition.lon}&rayon=20&carburant=${carburant}`)
+        .then(r => r.json()).catch(() => ({ ok: false }));
+
+      if (!dataFr.ok) {
+        throw new Error("Impossible de récupérer les prix français autour de votre position (aucune station à moins de 20 km, ou source indisponible). Réessayez dans quelques minutes.");
+      }
+      const priceFR = dataFr.moyenne;
+
+      setLoadingText('Calcul du trajet réel...');
+      const route = await distanceRoutiere(selectedPosition.lat, selectedPosition.lon, plusProche.lat, plusProche.lon);
+      const kmAR = route.km * 2;
+      const peageEstime = +(kmAR * 0.09).toFixed(2);
 
       const totalFR = priceFR * litresNeeded;
-      const totalAD = priceAD * litresNeeded;
-      const economieBrute = totalFR - totalAD;
+      const totalBorder = priceBorder * litresNeeded;
+      const coutTrajet = (kmAR * consumption / 100) * priceFR + peageEstime;
+      const economieBrute = (totalFR - totalBorder) - coutTrajet;
 
-      // Affichage des cartes FR et Frontière
       document.getElementById('cardFR').innerHTML = `
         <strong>📍 Prix moyen dans votre secteur (France) :</strong><br>
-        <span>${priceFR.toFixed(3)} €/L — Total plein : <strong>${totalFR.toFixed(2)} €</strong> (${litresNeeded.toFixed(1)} L à compléter)</span>
+        <span>${priceFR.toFixed(3)} €/L — Total plein : <strong>${totalFR.toFixed(2)} €</strong> (${litresNeeded.toFixed(1)} L à compléter, moyenne de ${dataFr.stationsCount} stations à moins de 20 km)</span>
       `;
-
       document.getElementById('cardBorder').innerHTML = `
-        <strong>🇦🇩 Prix à la frontière (Andorre / Station proche) :</strong><br>
-        <span>${priceAD.toFixed(3)} €/L — Total plein : <strong>${totalAD.toFixed(2)} €</strong></span>
+        <strong>${plusProche.pays === 'Espagne' ? '🇪🇸' : '🇮🇹'} Prix à la frontière (${plusProche.lieu}, ${plusProche.pays}) :</strong><br>
+        <span>${priceBorder.toFixed(3)} €/L — Total plein : <strong>${totalBorder.toFixed(2)} €</strong></span><br>
+        <span style="font-size:0.8rem; color:#666;">Trajet réel : ${kmAR.toFixed(0)} km A/R — péage estimé : ${peageEstime.toFixed(2)} €</span>
       `;
 
-      // Gestion de la couleur dynamique (Vert si rentable, Rouge si non-rentable)
       const profitCard = document.getElementById('cardProfitability');
-      
       if (economieBrute > 0) {
         profitCard.className = 'result-card profitability-status status-profitable';
         profitCard.innerHTML = `
           <div class="profitability-title">✅ C'EST RENTABLE !</div>
-          <div>Vous économisez environ <strong>${economieBrute.toFixed(2)} €</strong> sur votre plein de carburant.</div>
+          <div>Vous économisez environ <strong>${economieBrute.toFixed(2)} €</strong>, trajet et péage déjà déduits.</div>
         `;
       } else {
+        const litresPourRentable = coutTrajet / Math.max(priceFR - priceBorder, 0.01);
+        const litresSupp = Math.max(0, litresPourRentable - litresNeeded);
         profitCard.className = 'result-card profitability-status status-unprofitable';
         profitCard.innerHTML = `
           <div class="profitability-title">❌ PAS RENTABLE</div>
-          <div>Faire le déplacement vous coûterait <strong>${Math.abs(economieBrute).toFixed(2)} € de plus</strong> que de faire le plein en France.</div>
+          <div>Le déplacement coûterait <strong>${Math.abs(economieBrute).toFixed(2)} € de plus</strong> que de faire le plein en France, trajet et péage inclus.</div>
+          <div style="margin-top:8px; font-size:0.85rem;">En achetant ${litresSupp.toFixed(1)} L de plus sur place, le trajet devient rentable.</div>
+          ${bonsPlans[plusProche.pays] ? `<div style="margin-top:8px; font-size:0.85rem; font-style:italic;">${bonsPlans[plusProche.pays]}</div>` : ''}
         `;
       }
 
-      // Génération de la liste des stations françaises proches et moins chères
-      const stationsListContainer = document.getElementById('frStationsList');
-      stationsListContainer.innerHTML = '';
+      const frSection = document.getElementById('frStationsSection');
+      const frList = document.getElementById('frStationsList');
+      if (dataFr.top3 && dataFr.top3.length > 0) {
+        frList.innerHTML = '';
+        dataFr.top3.forEach(s => {
+          const item = document.createElement('div');
+          item.className = 'station-item';
+          const addr = [s.adresse, s.ville].filter(Boolean).join(', ') || 'Adresse non communiquée';
+          item.innerHTML = `
+            <div class="station-info">
+              <div class="station-name">${addr}</div>
+            </div>
+            <div class="station-price-tag"><div class="price-value">${s.prix.toFixed(3)} €</div></div>
+          `;
+          frList.appendChild(item);
+        });
+        frSection.style.display = 'block';
+      } else {
+        frSection.style.display = 'none';
+      }
 
-      const stationsFR = resFR.stations || [
-        { name: "TotalEnergies Relais", address: "Avenue d'Espagne, Perpignan", price: priceFR, distance: "2.4 km" },
-        { name: "E.Leclerc Drive", address: "Route de Canet, Perpignan", price: Math.max(1.50, priceFR - 0.03), distance: "4.1 km" },
-        { name: "Intermarché Contact", address: "Boulevard Sud, Perpignan", price: Math.max(1.50, priceFR - 0.01), distance: "5.0 km" }
-      ];
-
-      stationsFR.forEach(station => {
-        const item = document.createElement('div');
-        item.className = 'station-item';
-        item.innerHTML = `
-          <div class="station-info">
-            <div class="station-name">${station.name}</div>
-            <div class="station-address">${station.address}</div>
-          </div>
-          <div class="station-price-tag">
-            <div class="price-value">${station.price.toFixed(3)} €</div>
-            <div class="distance-value">à ${station.distance}</div>
-          </div>
-        `;
-        stationsListContainer.appendChild(item);
-      });
+      const borderSection = document.getElementById('borderStationsSection');
+      const borderList = document.getElementById('borderStationsList');
+      const borderTitle = document.getElementById('borderStationsTitle');
+      if (dataFront.top3 && dataFront.top3.length > 0) {
+        borderTitle.textContent = `${plusProche.pays === 'Espagne' ? '🇪🇸' : '🇮🇹'} Stations les moins chères à ${plusProche.lieu}`;
+        borderList.innerHTML = '';
+        dataFront.top3.forEach(s => {
+          const item = document.createElement('div');
+          item.className = 'station-item';
+          const addr = plusProche.source === 'it'
+            ? ([s.indirizzo, s.comune].filter(Boolean).join(', ') || 'Adresse non communiquée')
+            : ([s.direccion, s.rotulo].filter(Boolean).join(', ') || 'Adresse non communiquée');
+          item.innerHTML = `
+            <div class="station-info"><div class="station-name">${addr}</div></div>
+            <div class="station-price-tag"><div class="price-value">${s.prix.toFixed(3)} €</div></div>
+          `;
+          borderList.appendChild(item);
+        });
+        borderSection.style.display = 'block';
+      } else {
+        borderSection.style.display = 'none';
+      }
 
       stopLoader();
       document.getElementById('results').style.display = 'block';
@@ -757,6 +594,7 @@
       errorBox.innerText = err.message || 'Une erreur est survenue lors du calcul.';
       errorBox.style.display = 'block';
     }
+    calcBtn.disabled = false;
   }
 </script>
 
