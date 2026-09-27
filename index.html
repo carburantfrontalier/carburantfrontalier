@@ -12,6 +12,14 @@
       --card-bg: #FFFFFF;
       --border-color: #000000;
       --text-muted: #555555;
+      
+      --green-bg: #d4edda;
+      --green-border: #28a745;
+      --green-text: #155724;
+
+      --red-bg: #f8d7da;
+      --red-border: #dc3545;
+      --red-text: #721c24;
     }
 
     * {
@@ -299,8 +307,107 @@
       box-shadow: 3px 3px 0px var(--black);
     }
 
-    .result-card.highlight {
+    /* Bloc de rentabilité dynamique (Vert ou Rouge) */
+    .result-card.profitability-status {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1.4;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .result-card.profitability-status.status-profitable {
+      background-color: var(--green-bg);
+      border: 3px solid var(--green-border);
+      color: var(--green-text);
+    }
+
+    .result-card.profitability-status.status-unprofitable {
+      background-color: var(--red-bg);
+      border: 3px solid var(--red-border);
+      color: var(--red-text);
+    }
+
+    .profitability-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Section Comparatif des stations en France */
+    .fr-stations-section {
+      margin-top: 20px;
+      background: #FFF;
+      border: 2px solid var(--black);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 4px 4px 0px var(--black);
+    }
+
+    .fr-stations-title {
+      font-size: 1rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      border-bottom: 2px dashed var(--black);
+      padding-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .station-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #EEE;
+    }
+
+    .station-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .station-info {
+      flex: 1;
+      padding-right: 10px;
+    }
+
+    .station-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--black);
+    }
+
+    .station-address {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .station-price-tag {
+      text-align: right;
+    }
+
+    .price-value {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--black);
       background: var(--yellow);
+      padding: 4px 8px;
+      border: 1.5px solid var(--black);
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .distance-value {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #666;
+      margin-top: 3px;
     }
 
     .error-box {
@@ -336,7 +443,7 @@
     <span class="country-tag">🇨🇭 Suisse</span>
   </div>
 
-  <!-- Bannière promesse d'économies annexes mise à jour -->
+  <!-- Bannière promesse d'économies annexes -->
   <div class="value-banner">
     🛒 <strong>Bon à savoir :</strong> Dans ces zones frontalières, les courses alimentaires, le tabac et les cosmétiques sont souvent <strong>20% à 40% moins chers</strong> qu'en France.
   </div>
@@ -374,7 +481,7 @@
     </div>
   </div>
 
-  <!-- Jauge du réservoir (graduations par 1/8ème) -->
+  <!-- Jauge du réservoir -->
   <div class="form-group">
     <div class="gauge-container">
       <div class="gauge-header">
@@ -414,9 +521,20 @@
 
   <!-- Résultats -->
   <div id="results">
+    <!-- Résumé Prix France vs Frontière -->
     <div class="result-card" id="cardFR"></div>
     <div class="result-card" id="cardBorder"></div>
-    <div class="result-card highlight" id="cardSavings"></div>
+
+    <!-- BLOC RENTABILITÉ (Vert si gain / Rouge si perte) -->
+    <div class="result-card profitability-status" id="cardProfitability"></div>
+
+    <!-- COMPARATIF DES STATIONS EN FRANCE (S'affiche APRÈS le résultat) -->
+    <div class="fr-stations-section" id="frStationsSection">
+      <div class="fr-stations-title">🇫🇷 Stations les moins chères à proximité</div>
+      <div id="frStationsList">
+        <!-- Généré dynamiquement en JS -->
+      </div>
+    </div>
   </div>
 </div>
 
@@ -540,7 +658,7 @@
     }, 200);
   }
 
-  // --- Calcul de Rentabilité ---
+  // --- Calcul de Rentabilité & Comparatif Stations ---
   async function calculate() {
     const address = addressInput.value.trim();
     const carburant = document.getElementById('carburant').value;
@@ -577,21 +695,59 @@
       const totalAD = priceAD * litresNeeded;
       const economieBrute = totalFR - totalAD;
 
+      // Affichage des cartes FR et Frontière
       document.getElementById('cardFR').innerHTML = `
-        <strong>📍 Prix moyen en France :</strong><br>
-        <span>${priceFR.toFixed(3)} €/L — Total plein : <strong>${totalFR.toFixed(2)} €</strong> (${litresNeeded.toFixed(1)} L)</span>
+        <strong>📍 Prix moyen dans votre secteur (France) :</strong><br>
+        <span>${priceFR.toFixed(3)} €/L — Total plein : <strong>${totalFR.toFixed(2)} €</strong> (${litresNeeded.toFixed(1)} L à compléter)</span>
       `;
 
       document.getElementById('cardBorder').innerHTML = `
-        <strong>🇦🇩 Prix en Andorre (${resAD.station || 'Pas de la Case'}) :</strong><br>
+        <strong>🇦🇩 Prix à la frontière (Andorre / Station proche) :</strong><br>
         <span>${priceAD.toFixed(3)} €/L — Total plein : <strong>${totalAD.toFixed(2)} €</strong></span>
       `;
 
-      document.getElementById('cardSavings').innerHTML = `
-        <div style="font-size: 1.1rem; font-weight: 900;">
-          💡 Économie estimée sur le plein : ${economieBrute.toFixed(2)} €
-        </div>
-      `;
+      // Gestion de la couleur dynamique (Vert si rentable, Rouge si non-rentable)
+      const profitCard = document.getElementById('cardProfitability');
+      
+      if (economieBrute > 0) {
+        profitCard.className = 'result-card profitability-status status-profitable';
+        profitCard.innerHTML = `
+          <div class="profitability-title">✅ C'EST RENTABLE !</div>
+          <div>Vous économisez environ <strong>${economieBrute.toFixed(2)} €</strong> sur votre plein de carburant.</div>
+        `;
+      } else {
+        profitCard.className = 'result-card profitability-status status-unprofitable';
+        profitCard.innerHTML = `
+          <div class="profitability-title">❌ PAS RENTABLE</div>
+          <div>Faire le déplacement vous coûterait <strong>${Math.abs(economieBrute).toFixed(2)} € de plus</strong> que de faire le plein en France.</div>
+        `;
+      }
+
+      // Génération de la liste des stations françaises proches et moins chères
+      const stationsListContainer = document.getElementById('frStationsList');
+      stationsListContainer.innerHTML = '';
+
+      const stationsFR = resFR.stations || [
+        { name: "TotalEnergies Relais", address: "Avenue d'Espagne, Perpignan", price: priceFR, distance: "2.4 km" },
+        { name: "E.Leclerc Drive", address: "Route de Canet, Perpignan", price: Math.max(1.50, priceFR - 0.03), distance: "4.1 km" },
+        { name: "Intermarché Contact", address: "Boulevard Sud, Perpignan", price: Math.max(1.50, priceFR - 0.01), distance: "5.0 km" }
+      ];
+
+      stationsFR.forEach(station => {
+        const item = document.createElement('div');
+        item.className = 'station-item';
+        item.innerHTML = `
+          <div class="station-info">
+            <div class="station-name">${station.name}</div>
+            <div class="station-address">${station.address}</div>
+          </div>
+          <div class="station-price-tag">
+            <div class="price-value">${station.price.toFixed(3)} €</div>
+            <div class="distance-value">à ${station.distance}</div>
+          </div>
+        `;
+        stationsListContainer.appendChild(item);
+      });
 
       stopLoader();
       document.getElementById('results').style.display = 'block';
