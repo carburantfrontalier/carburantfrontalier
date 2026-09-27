@@ -24,7 +24,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg-ecru);
       color: var(--black);
-      padding: 20px 12px;
+      padding: 24px 12px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -35,10 +35,12 @@
       width: 100%;
       max-width: 520px;
       background: var(--card-bg);
-      border: 3px solid var(--black);
+      border: 4px solid var(--black);
+      outline: 6px solid var(--yellow);
       border-radius: 16px;
       padding: 24px 20px;
-      box-shadow: 6px 6px 0px var(--black);
+      box-shadow: 8px 8px 0px var(--black);
+      margin: 10px auto;
     }
 
     h1 {
@@ -133,7 +135,7 @@
     /* Gauge de réservoir interactive */
     .gauge-container {
       margin-top: 10px;
-      background: #F3F3F3;
+      background: #F8F6F0;
       padding: 14px;
       border: 2px solid var(--black);
       border-radius: 10px;
@@ -156,9 +158,9 @@
     .gauge-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      margin-top: 4px;
+      margin-top: 6px;
       color: var(--text-muted);
     }
 
@@ -308,19 +310,23 @@
     </div>
   </div>
 
-  <!-- Jauge du réservoir -->
+  <!-- Jauge du réservoir (graduations par 1/8ème) -->
   <div class="form-group">
     <div class="gauge-container">
       <div class="gauge-header">
         <span>Niveau actuel du réservoir</span>
         <span id="gaugeValue">1/4</span>
       </div>
-      <input type="range" id="gaugeSlider" class="gauge-slider" min="0" max="1" step="0.25" value="0.25">
+      <input type="range" id="gaugeSlider" class="gauge-slider" min="0" max="1" step="0.125" value="0.25">
       <div class="gauge-labels">
         <span>Vide</span>
+        <span>1/8</span>
         <span>1/4</span>
+        <span>3/8</span>
         <span>1/2</span>
+        <span>5/8</span>
         <span>3/4</span>
+        <span>7/8</span>
         <span>Plein</span>
       </div>
     </div>
@@ -424,10 +430,20 @@
     if (e.target !== addressInput) autocompleteResults.style.display = 'none';
   });
 
-  // --- Jauge de réservoir ---
+  // --- Jauge de réservoir (découpage par 1/8ème) ---
   const gaugeSlider = document.getElementById('gaugeSlider');
   const gaugeValue = document.getElementById('gaugeValue');
-  const gaugeLabels = { '0': 'Vide', '0.25': '1/4', '0.5': '1/2', '0.75': '3/4', '1': 'Plein' };
+  const gaugeLabels = {
+    '0': 'Vide',
+    '0.125': '1/8',
+    '0.25': '1/4',
+    '0.375': '3/8',
+    '0.5': '1/2',
+    '0.625': '5/8',
+    '0.75': '3/4',
+    '0.875': '7/8',
+    '1': 'Plein'
+  };
 
   gaugeSlider.addEventListener('input', () => {
     gaugeValue.innerText = gaugeLabels[gaugeSlider.value] || '1/4';
@@ -445,7 +461,7 @@
     
     let progress = 0;
     loadingInterval = setInterval(() => {
-      progress += (100 / 250); // ~25 secondes de progression
+      progress += (100 / 250);
       if (progress > 92) progress = 92;
       progressBar.style.width = `${progress}%`;
     }, 100);
