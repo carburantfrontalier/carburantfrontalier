@@ -44,12 +44,56 @@
     }
 
     h1 {
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       font-weight: 900;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 6px;
       text-transform: uppercase;
       letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 14px;
+      line-height: 1.35;
+    }
+
+    /* Badges des pays frontaliers */
+    .countries-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .country-tag {
+      background: var(--bg-ecru);
+      border: 1.5px solid var(--black);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    /* En-tête valeur ajoutée / produits */
+    .value-banner {
+      background: #FFFDF0;
+      border: 2px dashed var(--black);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .value-banner strong {
+      color: #000;
     }
 
     .form-group {
@@ -158,7 +202,7 @@
     .gauge-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       margin-top: 6px;
       color: var(--text-muted);
@@ -276,6 +320,26 @@
 
 <div class="app-container">
   <h1>⛽ Carburant Frontalier</h1>
+  
+  <p class="hero-subtitle">
+    Calculez instantanément si aller faire le plein de l'autre côté de la frontière est réellement rentable pour vous !
+  </p>
+
+  <!-- Tags des pays frontaliers concernés -->
+  <div class="countries-badge-list">
+    <span class="country-tag">🇦🇩 Andorre</span>
+    <span class="country-tag">🇪🇸 Espagne</span>
+    <span class="country-tag">🇮🇹 Italie</span>
+    <span class="country-tag">🇩🇪 Allemagne</span>
+    <span class="country-tag">🇧🇪 Belgique</span>
+    <span class="country-tag">🇱🇺 Luxembourg</span>
+    <span class="country-tag">🇨🇭 Suisse</span>
+  </div>
+
+  <!-- Bannière promesse d'économies annexes -->
+  <div class="value-banner">
+    🛒 <strong>Doublez vos gains :</strong> Au-delà de l'essence, les courses alimentaires, le tabac et les produits de beauté coûtent souvent bien moins cher à la frontière !
+  </div>
 
   <!-- Adresse + Géolocalisation -->
   <div class="form-group">
@@ -333,7 +397,7 @@
   </div>
 
   <!-- Bouton de calcul -->
-  <button class="btn-submit" id="calcBtn" onclick="calculate()">Voir si ça vaut le coup</button>
+  <button class="btn-submit" id="calcBtn" onclick="calculate()">Calculer ma rentabilité</button>
 
   <!-- Loader Ludique -->
   <div id="loader" class="loader-container">
