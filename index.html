@@ -6,12 +6,12 @@
   <title>Carburant Frontalier - Calculez votre rentabilité</title>
   <style>
     :root {
-      --yellow: #FFCC00;
-      --yellow-light: #FFF9D6;
+      --yellow: #FFD000;
       --black: #000000;
-      --white: #FFFFFF;
+      --bg-ecru: #FBF9F1;
+      --card-bg: #FFFFFF;
       --border-color: #000000;
-      --text-muted: #444444;
+      --text-muted: #555555;
     }
 
     * {
@@ -22,74 +22,83 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--yellow);
+      background-color: var(--bg-ecru);
       color: var(--black);
-      padding: 16px;
+      padding: 20px 12px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
     }
 
     .app-container {
       width: 100%;
-      max-width: 600px;
-      background: var(--yellow);
-      padding: 24px 16px;
+      max-width: 520px;
+      background: var(--card-bg);
+      border: 3px solid var(--black);
+      border-radius: 16px;
+      padding: 24px 20px;
+      box-shadow: 6px 6px 0px var(--black);
     }
 
     h1 {
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-size: 1.6rem;
       font-weight: 900;
-      text-align: left;
-      margin-bottom: 24px;
-      line-height: 1.1;
-      letter-spacing: -1px;
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       position: relative;
     }
 
     label {
       display: block;
-      font-weight: 800;
-      font-size: 1rem;
-      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .input-geoloc-wrapper {
+      display: flex;
+      gap: 8px;
     }
 
     input[type="text"],
     input[type="number"],
     select {
       width: 100%;
-      padding: 14px 16px;
+      padding: 12px 14px;
       font-size: 1rem;
-      font-weight: 700;
+      font-weight: 600;
       border: 2px solid var(--black);
-      border-radius: 10px;
-      background-color: var(--yellow-light);
-      color: var(--black);
+      border-radius: 8px;
+      background: #FFF;
       outline: none;
-      transition: background-color 0.2s, border-color 0.2s;
     }
 
     input:focus, select:focus {
-      background-color: var(--white);
-      border-color: var(--black);
+      background-color: #FFFDF0;
     }
 
-    /* Dispositions Responsives */
-    .grid-2col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .btn-geoloc {
+      background: var(--yellow);
+      border: 2px solid var(--black);
+      border-radius: 8px;
+      padding: 0 14px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
     }
 
-    @media (max-width: 480px) {
-      .grid-2col {
-        grid-template-columns: 1fr;
-      }
+    .btn-geoloc:active {
+      transform: scale(0.95);
     }
 
     /* Autocomplétion d'adresse */
@@ -98,101 +107,99 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: var(--white);
+      background: #FFF;
       border: 2px solid var(--black);
-      border-radius: 10px;
+      border-radius: 8px;
       max-height: 200px;
       overflow-y: auto;
       z-index: 1000;
       margin-top: 4px;
-      box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
       display: none;
     }
 
     .autocomplete-item {
-      padding: 12px 14px;
+      padding: 10px 12px;
       cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: 0.9rem;
       border-bottom: 1px solid #EEE;
     }
 
     .autocomplete-item:hover {
       background-color: var(--yellow);
-      font-weight: 800;
+      font-weight: 700;
     }
 
     /* Gauge de réservoir interactive */
     .gauge-container {
-      background: var(--white);
-      padding: 16px;
+      margin-top: 10px;
+      background: #F3F3F3;
+      padding: 14px;
       border: 2px solid var(--black);
-      border-radius: 12px;
+      border-radius: 10px;
     }
 
     .gauge-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-weight: 800;
-      font-size: 0.95rem;
     }
 
     .gauge-slider {
       width: 100%;
       accent-color: var(--black);
       cursor: pointer;
-      height: 8px;
     }
 
     .gauge-labels {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      font-weight: 800;
-      margin-top: 6px;
+      font-weight: 700;
+      margin-top: 4px;
       color: var(--text-muted);
     }
 
-    /* Boutons */
+    /* Bouton principal */
     .btn-submit {
       width: 100%;
-      padding: 18px;
+      padding: 16px;
       background-color: var(--black);
-      color: var(--white);
-      font-size: 1.15rem;
+      color: var(--yellow);
+      font-size: 1.1rem;
       font-weight: 900;
-      border: none;
-      border-radius: 12px;
+      text-transform: uppercase;
+      border: 2px solid var(--black);
+      border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
-      margin-top: 8px;
-    }
-
-    .btn-submit:hover {
-      background-color: #222222;
+      box-shadow: 4px 4px 0px var(--yellow);
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin-top: 10px;
     }
 
     .btn-submit:active {
-      transform: scale(0.98);
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px var(--yellow);
     }
 
     /* Loader Ludique */
     .loader-container {
       display: none;
       text-align: center;
-      padding: 24px 16px;
-      background: var(--white);
+      padding: 20px 16px;
+      background: var(--bg-ecru);
       border: 2px solid var(--black);
       border-radius: 12px;
       margin-top: 20px;
+      box-shadow: 4px 4px 0px var(--black);
     }
 
     .pump-anim {
-      font-size: 2.8rem;
+      font-size: 2.5rem;
       animation: pumpBounce 0.8s infinite alternate ease-in-out;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     @keyframes pumpBounce {
@@ -202,16 +209,16 @@
 
     .loading-text {
       font-weight: 900;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: var(--black);
       margin-bottom: 6px;
     }
 
     .loading-subtext {
-      font-size: 0.9rem;
-      color: #444;
+      font-size: 0.88rem;
+      color: #333;
       font-style: italic;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       line-height: 1.3;
     }
 
@@ -238,17 +245,16 @@
     }
 
     .result-card {
-      background: var(--white);
+      background: #FFF;
       border: 2px solid var(--black);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 10px;
+      padding: 14px;
       margin-bottom: 12px;
-      font-size: 1rem;
+      box-shadow: 3px 3px 0px var(--black);
     }
 
     .result-card.highlight {
-      background: var(--white);
-      border-width: 3px;
+      background: var(--yellow);
     }
 
     .error-box {
@@ -256,23 +262,26 @@
       background: #FEE2E2;
       border: 2px solid var(--black);
       color: #991B1B;
-      padding: 14px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 8px;
       margin-top: 16px;
-      font-weight: 800;
-      font-size: 0.95rem;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
 
 <div class="app-container">
-  <h1>Calculez la rentabilité de votre plein d'essence</h1>
+  <h1>⛽ Carburant Frontalier</h1>
 
-  <!-- Adresse -->
+  <!-- Adresse + Géolocalisation -->
   <div class="form-group">
     <label for="address">Adresse ou ville de départ (France)</label>
-    <input type="text" id="address" placeholder="Ex: Perpignan, Ax-les-Thermes, Lille..." autocomplete="off">
+    <div class="input-geoloc-wrapper">
+      <input type="text" id="address" placeholder="Ex: Perpignan, Ax-les-Thermes, Lille..." autocomplete="off">
+      <button type="button" class="btn-geoloc" onclick="geolocateUser()" title="Utiliser ma position actuelle">📍</button>
+    </div>
     <div id="autocompleteResults" class="autocomplete-results"></div>
   </div>
 
@@ -288,12 +297,12 @@
   </div>
 
   <!-- Réservoir & Consommation -->
-  <div class="form-group grid-2col">
-    <div>
+  <div class="form-group" style="display: flex; gap: 12px;">
+    <div style="flex: 1;">
       <label for="tank">Capacité (L)</label>
       <input type="number" id="tank" value="50" min="10" max="150">
     </div>
-    <div>
+    <div style="flex: 1;">
       <label for="consumption">Conso (L/100km)</label>
       <input type="number" id="consumption" value="6.0" step="0.1" min="1">
     </div>
@@ -318,7 +327,7 @@
   </div>
 
   <!-- Bouton de calcul -->
-  <button class="btn-submit" id="calcBtn" onclick="calculate()">Trouver les stations</button>
+  <button class="btn-submit" id="calcBtn" onclick="calculate()">Voir si ça vaut le coup</button>
 
   <!-- Loader Ludique -->
   <div id="loader" class="loader-container">
@@ -342,6 +351,38 @@
 </div>
 
 <script>
+  // --- Géolocalisation utilisateur ---
+  function geolocateUser() {
+    const addressInput = document.getElementById('address');
+    if (!navigator.geolocation) {
+      alert("La géolocalisation n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    addressInput.value = "Recherche de votre position...";
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${longitude}&lat=${latitude}`);
+          const data = await res.json();
+          if (data.features && data.features.length > 0) {
+            addressInput.value = data.features[0].properties.label;
+          } else {
+            addressInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          }
+        } catch (e) {
+          addressInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        }
+      },
+      () => {
+        alert("Impossible d'accéder à votre géolocalisation.");
+        addressInput.value = "";
+      }
+    );
+  }
+
   // --- Autocomplétion adresse.data.gouv.fr ---
   const addressInput = document.getElementById('address');
   const autocompleteResults = document.getElementById('autocompleteResults');
@@ -404,7 +445,7 @@
     
     let progress = 0;
     loadingInterval = setInterval(() => {
-      progress += (100 / 250);
+      progress += (100 / 250); // ~25 secondes de progression
       if (progress > 92) progress = 92;
       progressBar.style.width = `${progress}%`;
     }, 100);
@@ -462,12 +503,12 @@
       `;
 
       document.getElementById('cardBorder').innerHTML = `
-        <strong>🇦🇩 Prix à la frontière (${resAD.station || 'Pas de la Case'}) :</strong><br>
+        <strong>🇦🇩 Prix en Andorre (${resAD.station || 'Pas de la Case'}) :</strong><br>
         <span>${priceAD.toFixed(3)} €/L — Total plein : <strong>${totalAD.toFixed(2)} €</strong></span>
       `;
 
       document.getElementById('cardSavings').innerHTML = `
-        <div style="font-size: 1.15rem; font-weight: 900;">
+        <div style="font-size: 1.1rem; font-weight: 900;">
           💡 Économie estimée sur le plein : ${economieBrute.toFixed(2)} €
         </div>
       `;
