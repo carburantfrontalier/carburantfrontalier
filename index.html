@@ -319,16 +319,22 @@
 </div>
 
 <script>
-  const FRONTIERES = [
-    { pays: 'Espagne', lieu: 'La Jonquera', lat: 42.4189, lon: 2.8747, live: true, source: 'es', zoneAPI: 'Jonquera' },
-    { pays: 'Italie',  lieu: 'Vintimille',   lat: 43.8497, lon: 7.5486, live: true, source: 'it', zoneAPI: 'Ventimiglia' },
-    { pays: 'Belgique',   lieu: 'Rekkem',    lat: 50.7500, lon: 3.2300, live: false },
-    { pays: 'Luxembourg', lieu: 'Zoufftgen', lat: 49.4700, lon: 6.1200, live: false }
+  // Frontières pas encore connectées à une source de prix (uniquement pour prévenir l'utilisateur).
+  // Espagne et Italie n'ont plus de liste en dur : la station la plus proche est trouvée
+  // automatiquement par /api/station-frontiere.
+  const FRONTIERES_BIENTOT = [
+    { pays: 'Belgique',   lieu: 'Rekkem',    lat: 50.7500, lon: 3.2300 },
+    { pays: 'Luxembourg', lieu: 'Zoufftgen', lat: 49.4700, lon: 6.1200 }
   ];
 
   const bonsPlans = {
     'Espagne': "Bon à savoir : fruits & légumes -25 à -45%, viande -30%, tabac -55%, beauté & hygiène -10 à -30% en Espagne.",
     'Italie': "Bon à savoir : café -48%, eau -40%, bière locale -30%, vin -14%, fruits -12 à -23% en Italie."
+  };
+
+  const PAYS_INFO = {
+    ES: { nom: 'Espagne', drapeau: '🇪🇸' },
+    IT: { nom: 'Italie',  drapeau: '🇮🇹' }
   };
 
   let selectedPosition = null;
@@ -434,6 +440,25 @@
     return { km: data.routes[0].distance / 1000, minutes: data.routes[0].duration / 60 };
   }
 
+  // Correspondance des carburants du formulaire -> API station-frontiere
+  function carburantPourApi(c) {
+    if (c === 'e10') return 'sp95';   // comme avant : l'E10 est comparé au SP95 à l'étranger
+    if (c === 'gplc') return 'gpl';
+    return c;
+  }
+
+  function afficherFrontiereNonConnectee(f) {
+    document.getElementById('cardFR').style.display = 'none';
+    document.getElementById('cardBorder').style.display = 'none';
+    const profitCard = document.getElementById('cardProfitability');
+    profitCard.className = 'result-card profitability-status status-warning';
+    profitCard.innerHTML = `
+      <div class="profitability-title">⚠ Frontière la plus proche : ${f.pays}</div>
+      <div>La frontière la plus proche de chez vous (${f.lieu}, ${f.pays}) n'est pas encore connectée à une source de prix officielle en temps réel sur ce site.</div>
+    `;
+    document.getElementById('results').style.display = 'block';
+  }
+
   async function calculate() {
     const carburant = document.getElementById('carburant').value;
     const tank = parseFloat(document.getElementById('tank').value) || 0;
@@ -454,49 +479,45 @@
     try {
       const litresNeeded = tank * (1 - currentGauge);
 
-      setLoadingText('Recherche de la frontière la plus proche...');
-      let plusProche = null, distMin = Infinity;
-      FRONTIERES.forEach(f => {
+      // Frontières "bientôt" (Belgique / Luxembourg) : la plus proche de l'utilisateur
+      let bientotProche = null, bientotDist = Infinity;
+      FRONTIERES_BIENTOT.forEach(f => {
         const d = distanceKm(selectedPosition.lat, selectedPosition.lon, f.lat, f.lon);
-        if (d < distMin) { distMin = d; plusProche = f; }
+        if (d < bientotDist) { bientotDist = d; bientotProche = f; }
       });
 
-      if (!plusProche.live) {
-        stopLoader();
-        document.getElementById('cardFR').style.display = 'none';
-        document.getElementById('cardBorder').style.display = 'none';
-        const profitCard = document.getElementById('cardProfitability');
-        profitCard.className = 'result-card profitability-status status-warning';
-        profitCard.innerHTML = `
-          <div class="profitability-title">⚠ Frontière la plus proche : ${plusProche.pays}</div>
-          <div>La frontière la plus proche de chez vous (${plusProche.lieu}, ${plusProche.pays}) n'est pas encore connectée à une source de prix officielle en temps réel sur ce site.</div>
-        `;
-        document.getElementById('results').style.display = 'block';
-        calcBtn.disabled = false;
-        return;
+      setLoadingText('Recherche de la frontière la plus proche...');
+      const dataStation = await fetch(
+        `/api/station-frontiere?lat=${selectedPosition.lat}&lon=${selectedPosition.lon}&carburant=${carburantPourApi(carburant)}`
+      ).then(r => r.json()).catch(() => ({ erreur: 'indisponible' }));
+
+      const apiOk = dataStation && dataStation.trouve === true;
+
+      // Si la Belgique / le Luxembourg est plus proche que toute station ES/IT trouvée
+      if (!apiOk || bientotDist < dataStation.trajet.volOiseauKm) {
+        if (bientotProche && (bientotDist < 150 || (apiOk && bientotDist < dataStation.trajet.volOiseauKm))) {
+          stopLoader();
+          afficherFrontiereNonConnectee(bientotProche);
+          calcBtn.disabled = false;
+          return;
+        }
       }
+
+      if (!apiOk) {
+        throw new Error(
+          (dataStation && dataStation.message)
+            ? dataStation.message
+            : `Impossible de récupérer les prix côté frontière en ce moment (source officielle indisponible). Réessayez dans quelques minutes.`
+        );
+      }
+
       document.getElementById('cardFR').style.display = 'block';
       document.getElementById('cardBorder').style.display = 'block';
 
-      setLoadingText('Récupération des prix côté frontière...');
-      const carburantFrontiere = carburant === 'e10' ? 'sp95' : carburant;
-      const endpointFrontiere = plusProche.source === 'it'
-        ? `/api/prix-it?comune=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburantFrontiere}`
-        : `/api/prix-es?municipio=${encodeURIComponent(plusProche.zoneAPI)}&carburant=${carburantFrontiere}`;
-      const dataFront = await fetch(endpointFrontiere).then(r => r.json()).catch(() => ({ ok: false }));
-
-      const carburantsDisponiblesFrontiere = plusProche.source === 'it'
-        ? ['gazole', 'sp95', 'e10', 'gplc']
-        : ['gazole', 'sp95', 'e10'];
-
-      if (!dataFront.ok || !carburantsDisponiblesFrontiere.includes(carburant)) {
-        throw new Error(
-          !carburantsDisponiblesFrontiere.includes(carburant)
-            ? "Ce carburant n'est pas suivi par la source officielle de ce pays pour l'instant."
-            : `Impossible de récupérer les prix côté ${plusProche.pays} en ce moment (source officielle indisponible). Réessayez dans quelques minutes.`
-        );
-      }
-      const priceBorder = dataFront.cheapest;
+      const stationBorder = dataStation.station;
+      const pays = PAYS_INFO[stationBorder.pays] || { nom: stationBorder.pays, drapeau: '' };
+      const lieu = stationBorder.lieu || stationBorder.nom;
+      const priceBorder = stationBorder.prixLitre;
 
       setLoadingText('Récupération des prix en France...');
       const dataFr = await fetch(`/api/prix-fr?lat=${selectedPosition.lat}&lon=${selectedPosition.lon}&rayon=20&carburant=${carburant}`)
@@ -508,8 +529,13 @@
       const priceFR = dataFr.moyenne;
 
       setLoadingText('Calcul du trajet réel...');
-      const route = await distanceRoutiere(selectedPosition.lat, selectedPosition.lon, plusProche.lat, plusProche.lon);
-      const kmAR = route.km * 2;
+      let kmAR;
+      if (dataStation.trajet && dataStation.trajet.allerRetourKm != null) {
+        kmAR = dataStation.trajet.allerRetourKm;
+      } else {
+        const route = await distanceRoutiere(selectedPosition.lat, selectedPosition.lon, stationBorder.lat, stationBorder.lon);
+        kmAR = route.km * 2;
+      }
       const peageEstime = +(kmAR * 0.09).toFixed(2);
 
       const totalFR = priceFR * litresNeeded;
@@ -522,7 +548,7 @@
         <span>${priceFR.toFixed(3)} €/L — Total plein : <strong>${totalFR.toFixed(2)} €</strong> (${litresNeeded.toFixed(1)} L à compléter, moyenne de ${dataFr.stationsCount} stations à moins de 20 km)</span>
       `;
       document.getElementById('cardBorder').innerHTML = `
-        <strong>${plusProche.pays === 'Espagne' ? '🇪🇸' : '🇮🇹'} Prix à la frontière (${plusProche.lieu}, ${plusProche.pays}) :</strong><br>
+        <strong>${pays.drapeau} Prix à la frontière (${lieu}, ${pays.nom}) :</strong><br>
         <span>${priceBorder.toFixed(3)} €/L — Total plein : <strong>${totalBorder.toFixed(2)} €</strong></span><br>
         <span style="font-size:0.8rem; color:#666;">Trajet réel : ${kmAR.toFixed(0)} km A/R — péage estimé : ${peageEstime.toFixed(2)} €</span>
       `;
@@ -542,7 +568,7 @@
           <div class="profitability-title">❌ PAS RENTABLE</div>
           <div>Le déplacement coûterait <strong>${Math.abs(economieBrute).toFixed(2)} € de plus</strong> que de faire le plein en France, trajet et péage inclus.</div>
           <div style="margin-top:8px; font-size:0.85rem;">En achetant ${litresSupp.toFixed(1)} L de plus sur place, le trajet devient rentable.</div>
-          ${bonsPlans[plusProche.pays] ? `<div style="margin-top:8px; font-size:0.85rem; font-style:italic;">${bonsPlans[plusProche.pays]}</div>` : ''}
+          ${bonsPlans[pays.nom] ? `<div style="margin-top:8px; font-size:0.85rem; font-style:italic;">${bonsPlans[pays.nom]}</div>` : ''}
         `;
       }
 
@@ -570,15 +596,13 @@
       const borderSection = document.getElementById('borderStationsSection');
       const borderList = document.getElementById('borderStationsList');
       const borderTitle = document.getElementById('borderStationsTitle');
-      if (dataFront.top3 && dataFront.top3.length > 0) {
-        borderTitle.textContent = `${plusProche.pays === 'Espagne' ? '🇪🇸' : '🇮🇹'} Stations les moins chères à ${plusProche.lieu}`;
+      if (dataStation.top3 && dataStation.top3.length > 0) {
+        borderTitle.textContent = `${pays.drapeau} Stations les moins chères à ${lieu}`;
         borderList.innerHTML = '';
-        dataFront.top3.forEach(s => {
+        dataStation.top3.forEach(s => {
           const item = document.createElement('div');
           item.className = 'station-item';
-          const addr = plusProche.source === 'it'
-            ? ([s.indirizzo, s.comune].filter(Boolean).join(', ') || 'Adresse non communiquée')
-            : ([s.direccion, s.rotulo].filter(Boolean).join(', ') || 'Adresse non communiquée');
+          const addr = [s.nom, s.adresse].filter(Boolean).join(' — ') || 'Adresse non communiquée';
           item.innerHTML = `
             <div class="station-info"><div class="station-name">${addr}</div></div>
             <div class="station-price-tag"><div class="price-value">${s.prix.toFixed(3)} €</div></div>
